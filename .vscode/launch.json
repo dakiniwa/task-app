@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot起動",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.example.taskapp.TaskappApplication",
+      "projectName": "taskapp",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}
