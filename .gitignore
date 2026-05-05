@@ -1,3 +1,6 @@
+# 全体
+.DS_Store
+
 # Java / Maven
 target/
 
@@ -23,5 +26,3 @@ npm-debug.log*
 # codex
 .codex/config.toml
 
-# specs
-docs/
