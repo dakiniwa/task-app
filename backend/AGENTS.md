@@ -4,21 +4,18 @@
 
 `backend/` 配下のJava / Spring Bootアプリケーションに適用する。
 
----
 
 ## 技術スタック
 
-- Java: 21
+- Java: 25
 - Spring Boot: 4
 - Spring Data JPA
 - PostgreSQL: 17
 
----
-
 ## アーキテクチャ
 
 モジュラモノリス構成とする。
-
+```text
 com.example.taskapp
   ├─ task
   │    ├─ controller
@@ -30,8 +27,7 @@ com.example.taskapp
        ├─ exception
        ├─ config
        └─ util
-
----
+```
 
 ## レイヤ責務
 
@@ -40,8 +36,6 @@ com.example.taskapp
 - domain: Entity / Enum
 - repository: DBアクセス
 - dto: API入出力
-
----
 
 ## API設計ルール
 
@@ -68,8 +62,6 @@ DELETE /users/{userId}/tasks/{taskId}
 - 削除は `deleted` フラグによる論理削除とする
 - `created_at` / `updated_at` を持つ
 
----
-
 ## API挙動ルール
 
 - 存在しない / 他ユーザーのリソース / 論理削除済みデータ → 404 Not Found
@@ -78,7 +70,25 @@ DELETE /users/{userId}/tasks/{taskId}
 - 削除は論理削除とする（deleted = true）
 - 削除成功時は 204 No Content を返却する
 
----
+## エラーハンドリングルール
+
+### HTTPステータスごとの対象ケース
+
+| HTTPステータス | ケース |
+|---|---|
+| 404 Not Found | 存在しないタスクID / 論理削除済みタスクへのアクセス / 他ユーザーのリソース |
+| 400 Bad Request | リクエストボディ・パスパラメータの入力値不正（バリデーションエラー） |
+| 405 Method Not Allowed | 許可されていないHTTPメソッド |
+| 500 Internal Server Error | サーバー内部エラー |
+
+### エラーレスポンスフォーマット
+
+- すべてのエラーレスポンスは以下のJSON構造に統一する
+  - `code`: HTTPステータスコード（整数）
+  - `message`: エラーの概要（必須）
+  - `details`: 補足情報（任意）
+- アプリケーション独自のエラーコードは持たない
+- 例外は共通ハンドリングで一元処理する
 
 ## ドメインルール
 
