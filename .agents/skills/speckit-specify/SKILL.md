@@ -16,6 +16,12 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Output Language
+
+- Generate `spec.md`, quality checklists, clarification questions, and final reports in Japanese.
+- Keep code identifiers, API paths, HTTP methods, enum values, file paths, commands, and technology names in their original notation when clearer.
+- If copied templates contain English placeholders, replace them with natural Japanese in the generated artifact.
+
 ## Pre-Execution Checks
 
 **Check for extension hooks (before specification)**:
@@ -114,11 +120,11 @@ Given that feature description, do this:
        Identify: actors, actions, data, constraints
     3. For unclear aspects:
        - Make informed guesses based on context and industry standards
-       - Only mark with [NEEDS CLARIFICATION: specific question] if:
+       - Only mark with [要確認: specific question] if:
          - The choice significantly impacts feature scope or user experience
          - Multiple reasonable interpretations exist with different implications
          - No reasonable default exists
-       - **LIMIT: Maximum 3 [NEEDS CLARIFICATION] markers total**
+       - **LIMIT: Maximum 3 [要確認] markers total**
        - Prioritize clarifications by impact: scope > security/privacy > user experience > technical details
     4. Fill User Scenarios & Testing section
        If no clear user flow: ERROR "Cannot determine user scenarios"
@@ -139,40 +145,41 @@ Given that feature description, do this:
    a. **Create Spec Quality Checklist**: Generate a checklist file at `SPECIFY_FEATURE_DIRECTORY/checklists/requirements.md` using the checklist template structure with these validation items:
 
       ```markdown
-      # Specification Quality Checklist: [FEATURE NAME]
+      # 仕様品質チェックリスト: [FEATURE NAME]
       
-      **Purpose**: Validate specification completeness and quality before proceeding to planning
-      **Created**: [DATE]
-      **Feature**: [Link to spec.md]
+      **目的**: 計画へ進む前に仕様の完全性と品質を検証する
+      **作成日**: [DATE]
+      **機能**: [spec.md へのリンク]
       
-      ## Content Quality
+      ## 内容品質
       
-      - [ ] No implementation details (languages, frameworks, APIs)
-      - [ ] Focused on user value and business needs
-      - [ ] Written for non-technical stakeholders
-      - [ ] All mandatory sections completed
+      - [ ] 実装詳細 (言語、フレームワーク、API) が含まれていない
+      - [ ] ユーザー価値と業務ニーズに焦点が当たっている
+      - [ ] 非技術ステークホルダー向けに書かれている
+      - [ ] 必須セクションがすべて記入されている
+      - [ ] 本文が日本語で書かれている
       
-      ## Requirement Completeness
+      ## 要件の完全性
       
-      - [ ] No [NEEDS CLARIFICATION] markers remain
-      - [ ] Requirements are testable and unambiguous
-      - [ ] Success criteria are measurable
-      - [ ] Success criteria are technology-agnostic (no implementation details)
-      - [ ] All acceptance scenarios are defined
-      - [ ] Edge cases are identified
-      - [ ] Scope is clearly bounded
-      - [ ] Dependencies and assumptions identified
+      - [ ] [要確認] マーカーが残っていない
+      - [ ] 要件がテスト可能で曖昧でない
+      - [ ] 成功基準が測定可能である
+      - [ ] 成功基準が技術非依存である (実装詳細を含まない)
+      - [ ] すべての受け入れシナリオが定義されている
+      - [ ] エッジケースが特定されている
+      - [ ] スコープが明確に境界付けられている
+      - [ ] 依存関係と前提が特定されている
       
-      ## Feature Readiness
+      ## 機能の準備状況
       
-      - [ ] All functional requirements have clear acceptance criteria
-      - [ ] User scenarios cover primary flows
-      - [ ] Feature meets measurable outcomes defined in Success Criteria
-      - [ ] No implementation details leak into specification
+      - [ ] すべての機能要件に明確な受け入れ基準がある
+      - [ ] ユーザーシナリオが主要フローをカバーしている
+      - [ ] 機能が成功基準で定義された測定可能な成果を満たしている
+      - [ ] 実装詳細が仕様へ漏れていない
       
-      ## Notes
+      ## メモ
       
-      - Items marked incomplete require spec updates before `/speckit-clarify` or `/speckit-plan`
+      - 未完了項目は `/speckit-clarify` または `/speckit-plan` の前に仕様更新が必要
       ```
 
    b. **Run Validation Check**: Review the spec against each checklist item:
@@ -183,34 +190,34 @@ Given that feature description, do this:
 
       - **If all items pass**: Mark checklist complete and proceed to step 8
 
-      - **If items fail (excluding [NEEDS CLARIFICATION])**:
+      - **If items fail (excluding [要確認])**:
         1. List the failing items and specific issues
         2. Update the spec to address each issue
         3. Re-run validation until all items pass (max 3 iterations)
         4. If still failing after 3 iterations, document remaining issues in checklist notes and warn user
 
-      - **If [NEEDS CLARIFICATION] markers remain**:
-        1. Extract all [NEEDS CLARIFICATION: ...] markers from the spec
+      - **If [要確認] markers remain**:
+        1. Extract all [要確認: ...] markers from the spec
         2. **LIMIT CHECK**: If more than 3 markers exist, keep only the 3 most critical (by scope/security/UX impact) and make informed guesses for the rest
         3. For each clarification needed (max 3), present options to user in this format:
 
            ```markdown
-           ## Question [N]: [Topic]
+           ## 質問 [N]: [トピック]
            
-           **Context**: [Quote relevant spec section]
+           **Context**: [関連する仕様セクションの引用]
            
-           **What we need to know**: [Specific question from NEEDS CLARIFICATION marker]
+           **確認したいこと**: [要確認マーカーから抽出した具体的な質問]
            
-           **Suggested Answers**:
+           **回答候補**:
            
-           | Option | Answer | Implications |
-           |--------|--------|--------------|
-           | A      | [First suggested answer] | [What this means for the feature] |
-           | B      | [Second suggested answer] | [What this means for the feature] |
-           | C      | [Third suggested answer] | [What this means for the feature] |
-           | Custom | Provide your own answer | [Explain how to provide custom input] |
+           | 選択肢 | 回答 | 影響 |
+           |--------|------|------|
+           | A | [1つ目の回答候補] | [機能への影響] |
+           | B | [2つ目の回答候補] | [機能への影響] |
+           | C | [3つ目の回答候補] | [機能への影響] |
+           | Custom | 自由記述 | [自由記述の指定方法] |
            
-           **Your choice**: _[Wait for user response]_
+           **選択**: _[ユーザー回答を待つ]_
            ```
 
         4. **CRITICAL - Table Formatting**: Ensure markdown tables are properly formatted:
@@ -221,7 +228,7 @@ Given that feature description, do this:
         5. Number questions sequentially (Q1, Q2, Q3 - max 3 total)
         6. Present all questions together before waiting for responses
         7. Wait for user to respond with their choices for all questions (e.g., "Q1: A, Q2: Custom - [details], Q3: B")
-        8. Update the spec by replacing each [NEEDS CLARIFICATION] marker with the user's selected or provided answer
+        8. Update the spec by replacing each [要確認] marker with the user's selected or provided answer
         9. Re-run validation after all clarifications are resolved
 
    d. **Update Checklist**: After each validation iteration, update the checklist file with current pass/fail status
@@ -281,8 +288,8 @@ Given that feature description, do this:
 When creating this spec from a user prompt:
 
 1. **Make informed guesses**: Use context, industry standards, and common patterns to fill gaps
-2. **Document assumptions**: Record reasonable defaults in the Assumptions section
-3. **Limit clarifications**: Maximum 3 [NEEDS CLARIFICATION] markers - use only for critical decisions that:
+2. **Document assumptions**: Record reasonable defaults in the 前提 section
+3. **Limit clarifications**: Maximum 3 [要確認] markers - use only for critical decisions that:
    - Significantly impact feature scope or user experience
    - Have multiple reasonable interpretations with different implications
    - Lack any reasonable default

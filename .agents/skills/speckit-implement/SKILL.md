@@ -16,6 +16,12 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Output Language
+
+- Report implementation progress, blockers, validation results, and completion summaries in Japanese.
+- Keep task IDs, file paths, commands, code identifiers, API paths, enum values, and technology names in their original notation when clearer.
+- When updating `tasks.md`, preserve the existing Japanese task wording and mark completed tasks with `[X]`.
+
 ## Pre-Execution Checks
 
 **Check for extension hooks (before implementation)**:
