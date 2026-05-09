@@ -30,7 +30,7 @@
 
 *GATE: Phase 0 research の前に合格必須。Phase 1 design 後に再確認する。*
 
-- **仕様参照**: 最寄りの `AGENTS.md`、`.specify/memory/constitution.md`、関連する `.specify/` 成果物を確認する。矛盾があれば記録し、実装前に解消する。
+- **仕様参照**: 最寄りの `AGENTS.md`、`.specify/memory/constitution.md`、関連する `specs/` 配下の機能仕様成果物を確認する。矛盾があれば記録し、実装前に解消する。
 - **バックエンドAPI先行**: フロントエンド統合タスクより前に、バックエンドの domain、repository、service、controller、DTO、API契約、API検証を計画する。
 - **REST/user scope**: Task エンドポイントは複数形リソースパスを使い、動詞を含めず、`userId` を含める。例: `/users/{userId}/tasks/{taskId}`。
 - **ドメイン不変条件**: Task status は `TODO` / `DOING` / `DONE` のみとする。削除は論理削除とし、Task の timestamps と `userId` を保持する。

@@ -21,7 +21,7 @@
 ### [PRINCIPLE_4_NAME]
 <!-- 例: IV. 仕様を唯一の正とする -->
 [PRINCIPLE_4_DESCRIPTION]
-<!-- 例: `.specify/` に未定義の要求は実装前に確認する。 -->
+<!-- 例: `specs/` に未定義の要求は実装前に確認する。 -->
 
 ### [PRINCIPLE_5_NAME]
 <!-- 例: V. 境界の明確化と拡張性 -->

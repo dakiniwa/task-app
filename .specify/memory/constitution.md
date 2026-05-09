@@ -1,35 +1,18 @@
 <!--
 Sync Impact Report
-- Version change: 1.1.0 -> 1.2.0
+- Version change: 1.2.0 -> 1.2.1
 - Modified principles:
-  - I. Simplicity First -> I. シンプルさ最優先
-  - II. Consistency by Design -> II. 一貫性を設計に組み込む
-  - III. Backend-First Delivery -> III. バックエンドAPI先行
-  - IV. Specification as Single Source of Truth -> IV. 仕様を唯一の正とする
-  - V. Clear Boundaries and Extensibility -> V. 境界の明確化と拡張性
+  - IV. 仕様を唯一の正とする: 機能仕様成果物の正本ルートを `specs/` に明確化
 - Added sections:
-  - 出力言語ポリシー
-  - Jira連動ブランチ運用
+  - None
 - Removed sections:
   - None
 - Templates requiring updates:
   - ✅ .specify/templates/plan-template.md
-  - ✅ .specify/templates/spec-template.md
   - ✅ .specify/templates/tasks-template.md
-  - ✅ .specify/templates/checklist-template.md
   - ✅ .specify/templates/constitution-template.md
-  - ✅ .agents/skills/speckit-specify/SKILL.md
-  - ✅ .agents/skills/speckit-plan/SKILL.md
-  - ✅ .agents/skills/speckit-tasks/SKILL.md
-  - ✅ .agents/skills/speckit-implement/SKILL.md
-  - ✅ .agents/skills/speckit-git-feature/SKILL.md
-  - ✅ .agents/skills/speckit-git-validate/SKILL.md
-  - ✅ .specify/extensions/git/commands/speckit.git.feature.md
-  - ✅ .specify/extensions/git/commands/speckit.git.validate.md
-  - ✅ .specify/extensions/git/scripts/bash/git-common.sh
-  - ✅ .specify/extensions/git/scripts/powershell/git-common.ps1
-  - ✅ .specify/scripts/bash/common.sh
   - ✅ AGENTS.md
+  - ✅ frontend/AGENTS.md
 - Follow-up TODOs:
   - None
 -->
@@ -59,8 +42,8 @@ Sync Impact Report
 不安定なバックエンド前提にUIを結合することを防ぐ。
 
 ### IV. 仕様を唯一の正とする
-すべての実装判断は `.specify/` 配下の成果物に追跡できなければならない。
-`.specify/` に定義されていない要求は未定義として扱い、実装前に確認しなければ
+すべての実装判断は `specs/` 配下の機能仕様成果物に追跡できなければならない。
+`specs/` に定義されていない要求は未定義として扱い、実装前に確認しなければ
 ならない。仮定は仕様成果物に明示しなければならない。
 
 根拠: 仕様駆動開発では、暗黙のスコープ拡張を避けるために、判断が明確かつ
@@ -151,4 +134,4 @@ Sync Impact Report
 - Jiraタスクに対応する実装レビューでは、ブランチ名とPull Requestの向きが
   Jira連動ブランチ運用に従っていることを確認しなければならない。
 
-**Version**: 1.2.0 | **Ratified**: 2026-05-05 | **Last Amended**: 2026-05-09
+**Version**: 1.2.1 | **Ratified**: 2026-05-05 | **Last Amended**: 2026-05-09

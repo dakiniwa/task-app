@@ -34,7 +34,7 @@
 
 - 決定: `userId`、`title`、`status` は必須。`description` は任意。`status` は `TODO`、`DOING`、`DONE` のみ受け付ける。
 - 根拠: [spec.md](./spec.md) の FR-003、FR-015、エッジケースに明記されている。認証は導入しないため、`userId` はパスパラメータとして必ず検証する。
-- 検討した代替案: status 未指定時に `TODO` を補完する案は、今回の `.specify/` 仕様が status 必須を定義しているため採用しない。
+- 検討した代替案: status 未指定時に `TODO` を補完する案は、今回の `specs/` 配下の仕様が status 必須を定義しているため採用しない。
 
 ## 7. 更新方式
 

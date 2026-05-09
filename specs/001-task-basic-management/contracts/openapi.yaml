@@ -125,10 +125,11 @@ components:
       name: userId
       in: path
       required: true
-      description: 外部から与えられるユーザー識別子。
+      description: 外部から与えられるユーザー識別子。実装では `@NotBlank` 相当として空文字・空白のみを拒否する。
       schema:
         type: string
         minLength: 1
+        pattern: "\\S"
     TaskId:
       name: taskId
       in: path
@@ -153,7 +154,9 @@ components:
       properties:
         title:
           type: string
+          description: 実装では `@NotBlank` 相当として空文字・空白のみを拒否する。
           minLength: 1
+          pattern: "\\S"
         description:
           type:
             - string
@@ -169,7 +172,9 @@ components:
       properties:
         title:
           type: string
+          description: 実装では `@NotBlank` 相当として空文字・空白のみを拒否する。
           minLength: 1
+          pattern: "\\S"
         description:
           type:
             - string

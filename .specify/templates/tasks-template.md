@@ -22,7 +22,7 @@ description: "機能実装用タスクリストテンプレート"
 
 - **Backend**: `backend/src/main/java/com/example/taskapp/`, `backend/src/test/`
 - **Frontend**: `frontend/src/app/`, `frontend/src/features/tasks/`, `frontend/src/shared/`
-- **Docs**: `docs/`, 機能固有の `.specify/specs/` 配下ドキュメント
+- **Docs**: `docs/`, 機能固有の `specs/` 配下ドキュメント
 - 生成されるタスクのパスは plan.md の具体パスを使わなければならない。
 
 <!--

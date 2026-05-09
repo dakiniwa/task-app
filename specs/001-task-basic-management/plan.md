@@ -17,7 +17,7 @@
 **テスト**: Maven (`./mvnw test`)、JUnit 5、Spring Boot Test、MockMvc、JPA repository/service の統合テスト。DB 固有の検証は PostgreSQL Testcontainers で行う。
 **対象プラットフォーム**: ローカル開発環境で稼働する Web API。既定ポートは Spring Boot の `8080`。
 **プロジェクト種別**: モジュラモノリス内の backend web-service。frontend 連携は API 契約確定後の後続サイクル。
-**性能目標**: 個人利用向け CRUD API として、主要操作が通常のローカル/単一DB構成で遅延なく返ることを目指す。仕様上の数値 SLA は設定しない。
+**性能目標**: 性能SLAは今回対象外。通常のローカル/単一DB構成でCRUDが成立することを確認する。
 **制約**: 認証は導入せず、`userId` は外部から与えられる識別子として扱う。URL に動詞を含めない。`userId`、`title`、`status` は必須、`description` は任意。アプリケーション独自のエラーコードは追加しない。作成・更新時刻は JST (`Asia/Tokyo`, UTC+09:00) の API 表現に統一し、`ZoneId.systemDefault()` などサーバのデフォルトタイムゾーンには依存しない。
 **スケール/スコープ**: Backend API 5 endpoints、主要 Entity は `Task`、Enum は `TaskStatus`、共通レスポンスは `ErrorResponse`。対象サブタスクは `SCRUM-16` から `SCRUM-23`。
 
@@ -25,7 +25,7 @@
 
 *GATE: Phase 0 research の前に合格必須。Phase 1 design 後に再確認する。*
 
-- **仕様参照**: PASS。`.specify/memory/constitution.md`、ルート `AGENTS.md`、`backend/AGENTS.md`、`frontend/AGENTS.md`、[spec.md](./spec.md) を確認した。仕様判断は `.specify/` 成果物を優先する。
+- **仕様参照**: PASS。`.specify/memory/constitution.md`、ルート `AGENTS.md`、`backend/AGENTS.md`、`frontend/AGENTS.md`、[spec.md](./spec.md) を確認した。仕様判断は `specs/` 配下の機能仕様成果物を優先する。
 - **バックエンドAPI先行**: PASS。本計画は backend REST API、永続化、DTO、共通エラー、API検証を対象とし、frontend 接続は後続に残す。
 - **REST/user scope**: PASS。対象 API は `GET/POST /users/{userId}/tasks` と `GET/PUT/DELETE /users/{userId}/tasks/{taskId}`。動詞パスは使わない。
 - **ドメイン不変条件**: PASS。Task status は `TODO` / `DOING` / `DONE` のみ。削除は論理削除。Task は `userId`、`createdAt`、`updatedAt` を保持する。API 応答の timestamp は JST オフセット付き ISO-8601 とする。
@@ -34,7 +34,7 @@
 - **日本語成果物**: PASS。`plan.md`、`research.md`、`data-model.md`、`quickstart.md`、`contracts/` 配下の説明は日本語で作成する。
 - **Jiraブランチ運用**: PASS。この計画は親ブランチ `feature/SCRUM-6` 上で作成する。サブタスク実装は `/speckit-tasks` 後、各実装開始直前に `feature/sub/SCRUM-16` から `feature/sub/SCRUM-23` の単位で切る。
 
-**差分記録**: `backend/AGENTS.md` には「作成時 status 未指定は `TODO`」「更新は部分更新」とあるが、今回の [spec.md](./spec.md) は `status` 必須入力と、`title` / `description` / `status` 更新を定義している。本機能では憲章の「仕様を唯一の正とする」に従い、`.specify/` の仕様を優先する。
+**差分記録**: `backend/AGENTS.md` には「作成時 status 未指定は `TODO`」「更新は部分更新」とあるが、今回の [spec.md](./spec.md) は `status` 必須入力と、`title` / `description` / `status` 更新を定義している。本機能では憲章の「仕様を唯一の正とする」に従い、`specs/` 配下の仕様を優先する。
 
 ## プロジェクト構成
 
@@ -93,7 +93,7 @@ frontend/
 
 ## 設計後の憲章チェック
 
-- **仕様参照**: PASS。設計成果物は [spec.md](./spec.md) の FR-001 から FR-015、および成功基準 SC-001 から SC-006 に対応する。
+- **仕様参照**: PASS。設計成果物は [spec.md](./spec.md) の FR-001 から FR-016、および成功基準 SC-001 から SC-007 に対応する。
 - **バックエンドAPI先行**: PASS。設計対象は backend API 契約と永続化境界であり、frontend 接続は含めていない。
 - **REST/user scope**: PASS。OpenAPI 契約は `userId` をすべての Task 操作パスに含め、動詞を含む URL を定義していない。
 - **ドメイン不変条件**: PASS。`TaskStatus` は `TODO` / `DOING` / `DONE` のみ、削除済み Task は通常取得・更新・削除対象から除外する。時刻方針は JST API 表現と server timezone 非依存を設計成果物に反映した。
