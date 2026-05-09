@@ -69,6 +69,13 @@ task-app/
 - レイヤ間でモデルの責務を分離するs
 - 変更は小さく保ち、機能単位で実装・確認する
 
+## ブランチ運用ルール
+
+- Jiraのメインタスクは `feature/SCRUM-x` ブランチで対応する
+- Jiraのサブタスクは `feature/sub/SCRUM-x` ブランチで対応する
+- サブタスク完了時は `feature/sub/SCRUM-x` から対応する `feature/SCRUM-x` へPull Requestを作成する
+- 全サブタスク完了後、`feature/SCRUM-x` から `main` へPull Requestを作成する
+
 ---
 
 ## 禁止事項

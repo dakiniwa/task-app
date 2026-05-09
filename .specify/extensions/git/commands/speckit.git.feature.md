@@ -6,6 +6,15 @@ description: "Create a feature branch with sequential or timestamp numbering"
 
 Create and switch to a new git feature branch for the given specification. This command handles **branch creation only** — the spec directory and files are created by the core `/speckit.specify` workflow.
 
+## Project Jira Branch Policy
+
+For Jira-backed work in this project, prefer explicit branch names:
+
+- Main Jira task: `feature/SCRUM-x` (example: `feature/SCRUM-6`)
+- Jira subtask: `feature/sub/SCRUM-x` (example: `feature/sub/SCRUM-16`)
+
+When the user provides one of these branch names, pass it through as `GIT_BRANCH_NAME` so the script creates the exact branch name.
+
 ## User Input
 
 ```text
@@ -63,5 +72,5 @@ If Git is not installed or the current directory is not a Git repository:
 ## Output
 
 The script outputs JSON with:
-- `BRANCH_NAME`: The branch name (e.g., `003-user-auth` or `20260319-143022-user-auth`)
+- `BRANCH_NAME`: The branch name (e.g., `feature/SCRUM-6`, `feature/sub/SCRUM-16`, `003-user-auth`, or `20260319-143022-user-auth`)
 - `FEATURE_NUM`: The numeric or timestamp prefix used

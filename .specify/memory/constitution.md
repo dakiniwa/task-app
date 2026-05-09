@@ -1,6 +1,6 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 -> 1.1.0
+- Version change: 1.1.0 -> 1.2.0
 - Modified principles:
   - I. Simplicity First -> I. シンプルさ最優先
   - II. Consistency by Design -> II. 一貫性を設計に組み込む
@@ -9,6 +9,7 @@ Sync Impact Report
   - V. Clear Boundaries and Extensibility -> V. 境界の明確化と拡張性
 - Added sections:
   - 出力言語ポリシー
+  - Jira連動ブランチ運用
 - Removed sections:
   - None
 - Templates requiring updates:
@@ -21,6 +22,13 @@ Sync Impact Report
   - ✅ .agents/skills/speckit-plan/SKILL.md
   - ✅ .agents/skills/speckit-tasks/SKILL.md
   - ✅ .agents/skills/speckit-implement/SKILL.md
+  - ✅ .agents/skills/speckit-git-feature/SKILL.md
+  - ✅ .agents/skills/speckit-git-validate/SKILL.md
+  - ✅ .specify/extensions/git/commands/speckit.git.feature.md
+  - ✅ .specify/extensions/git/commands/speckit.git.validate.md
+  - ✅ .specify/extensions/git/scripts/bash/git-common.sh
+  - ✅ .specify/extensions/git/scripts/powershell/git-common.ps1
+  - ✅ .specify/scripts/bash/common.sh
   - ✅ AGENTS.md
 - Follow-up TODOs:
   - None
@@ -103,6 +111,18 @@ Sync Impact Report
 - 既存テンプレートの見出しや説明文は、日本語成果物を生成できるように維持しなければ
   ならない。
 
+## Jira連動ブランチ運用
+
+- Jira のメインタスクに対応するブランチは `feature/SCRUM-x` 形式で作成しなければならない。
+- Jira のサブタスクに対応するブランチは `feature/sub/SCRUM-x` 形式で作成しなければならない。
+- `x` は Jira issue key の数値部分であり、例として `SCRUM-6`, `SCRUM-16` を使用する。
+- サブタスク完了時は `feature/sub/SCRUM-x` から対応する親ブランチ `feature/SCRUM-x` へ
+  Pull Request を作成し、レビュー後にマージしなければならない。
+- すべてのサブタスクが完了した後、親ブランチ `feature/SCRUM-x` から `main` へ
+  Pull Request を作成し、レビュー後にマージしなければならない。
+- Spec Kit の標準採番ブランチ (`001-*`, timestamp形式) は互換目的で許可するが、
+  Jiraタスクで進める作業では Jira issue key に基づくブランチ名を優先しなければならない。
+
 ## Governance
 
 この憲章は、競合するプロセスガイダンスより優先される。すべての plan、spec、task
@@ -128,5 +148,7 @@ Sync Impact Report
   含む作業を却下しなければならない。
 - Spec Kit 成果物が日本語でない場合、該当成果物を修正してから次工程へ進まなければ
   ならない。
+- Jiraタスクに対応する実装レビューでは、ブランチ名とPull Requestの向きが
+  Jira連動ブランチ運用に従っていることを確認しなければならない。
 
-**Version**: 1.1.0 | **Ratified**: 2026-05-05 | **Last Amended**: 2026-05-09
+**Version**: 1.2.0 | **Ratified**: 2026-05-05 | **Last Amended**: 2026-05-09

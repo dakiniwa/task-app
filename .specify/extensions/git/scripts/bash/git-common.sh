@@ -12,9 +12,16 @@ has_git() {
 }
 
 # Strip a single optional path segment (e.g. gitflow "feat/004-name" -> "004-name").
+# Preserve project Jira branch forms:
+# - feature/SCRUM-6
+# - feature/sub/SCRUM-16
 # Only when the full name is exactly two slash-free segments; otherwise returns the raw name.
 spec_kit_effective_branch_name() {
     local raw="$1"
+    if [[ "$raw" =~ ^feature/SCRUM-[0-9]+$ ]] || [[ "$raw" =~ ^feature/sub/SCRUM-[0-9]+$ ]]; then
+        printf '%s\n' "$raw"
+        return 0
+    fi
     if [[ "$raw" =~ ^([^/]+)/([^/]+)$ ]]; then
         printf '%s\n' "${BASH_REMATCH[2]}"
     else
@@ -44,9 +51,17 @@ check_feature_branch() {
     if [[ "$branch" =~ ^[0-9]{3,}- ]] && [[ ! "$branch" =~ ^[0-9]{7}-[0-9]{6}- ]] && [[ ! "$branch" =~ ^[0-9]{7,8}-[0-9]{6}$ ]]; then
         is_sequential=true
     fi
-    if [[ "$is_sequential" != "true" ]] && [[ ! "$branch" =~ ^[0-9]{8}-[0-9]{6}- ]]; then
+    local is_jira_main=false
+    local is_jira_subtask=false
+    if [[ "$branch" =~ ^feature/SCRUM-[0-9]+$ ]]; then
+        is_jira_main=true
+    fi
+    if [[ "$branch" =~ ^feature/sub/SCRUM-[0-9]+$ ]]; then
+        is_jira_subtask=true
+    fi
+    if [[ "$is_sequential" != "true" ]] && [[ ! "$branch" =~ ^[0-9]{8}-[0-9]{6}- ]] && [[ "$is_jira_main" != "true" ]] && [[ "$is_jira_subtask" != "true" ]]; then
         echo "ERROR: Not on a feature branch. Current branch: $raw" >&2
-        echo "Feature branches should be named like: 001-feature-name, 1234-feature-name, or 20260319-143022-feature-name" >&2
+        echo "Feature branches should be named like: feature/SCRUM-6, feature/sub/SCRUM-16, 001-feature-name, 1234-feature-name, or 20260319-143022-feature-name" >&2
         return 1
     fi
 
