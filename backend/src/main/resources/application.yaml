@@ -1,3 +1,16 @@
 spring:
   application:
     name: taskapp
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/taskapp}
+    username: ${SPRING_DATASOURCE_USERNAME:taskapp}
+    password: ${SPRING_DATASOURCE_PASSWORD:taskapp}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+    open-in-view: false
