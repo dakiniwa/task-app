@@ -56,8 +56,8 @@
 
 ## 10. テスト方針
 
-- 決定: 正常系と異常系を backend の自動テストで確認する。Controller は MockMvc、Service は business rule、Repository/JPA は PostgreSQL Testcontainers を使う統合テストで確認する。時刻のテストでは固定 `Clock` を使い、サーバのデフォルトタイムゾーンに依存しないことを確認する。
-- 根拠: FR-014 が登録、一覧、詳細、更新、削除、バリデーション、共通エラーの完了条件を確認できるテストを求めている。
+- 決定: 正常系と異常系を backend の自動テストで確認する。Controller は MockMvc、Service は business rule、Repository/JPA は DBUnit で既知データを投入する統合テストで確認する。時刻のテストでは固定 `Clock` を使い、サーバのデフォルトタイムゾーンに依存しないことを確認する。
+- 根拠: FR-014 が登録、一覧、詳細、更新、削除、バリデーション、共通エラーの完了条件を確認できるテストを求めている。実装開始時の確認により、Repository/JPA の既知データ検証は PostgreSQL Testcontainers ではなく DBUnit へ変更する。
 - 検討した代替案: 手動 curl のみでは回帰検出が弱く、受け入れシナリオ 100% 確認の再現性が不足するため採用しない。
 
 ## 11. ブランチ運用

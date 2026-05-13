@@ -12,9 +12,9 @@
 ## 技術コンテキスト
 
 **言語/バージョン**: Backend は Java 25、Spring Boot 4.0.6。Frontend は後続接続対象として Next.js 16.2.4、TypeScript 5。
-**主要依存関係**: Spring Boot Starter Web、Spring Data JPA、Spring Validation、PostgreSQL JDBC Driver、Spring Boot Starter Test、PostgreSQL 用 Testcontainers。
+**主要依存関係**: Spring Boot Starter Web、Spring Data JPA、Spring Validation、PostgreSQL JDBC Driver、Spring Boot Starter Test、DBUnit、H2 テスト datasource。
 **ストレージ**: PostgreSQL 17。Task は JPA Entity として永続化し、削除は `deleted` フラグで表す。
-**テスト**: Maven (`./mvnw test`)、JUnit 5、Spring Boot Test、MockMvc、JPA repository/service の統合テスト。DB 固有の検証は PostgreSQL Testcontainers で行う。
+**テスト**: Maven (`./mvnw test`)、JUnit 5、Spring Boot Test、MockMvc、JPA repository/service の統合テスト。Repository/JPA の既知データ投入は DBUnit で行い、test profile の H2 datasource を使う。
 **対象プラットフォーム**: ローカル開発環境で稼働する Web API。既定ポートは Spring Boot の `8080`。
 **プロジェクト種別**: モジュラモノリス内の backend web-service。frontend 連携は API 契約確定後の後続サイクル。
 **性能目標**: 性能SLAは今回対象外。通常のローカル/単一DB構成でCRUDが成立することを確認する。
