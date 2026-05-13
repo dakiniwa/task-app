@@ -16,7 +16,7 @@ cd backend
 ./mvnw test
 ```
 
-実装時には `pom.xml` に Spring Data JPA、PostgreSQL JDBC Driver、Spring Validation、PostgreSQL 用 Testcontainers を追加する。
+実装時には `pom.xml` に Spring Data JPA、PostgreSQL JDBC Driver、Spring Validation、DBUnit、H2 テスト依存関係を追加する。
 
 ## 2. PostgreSQL 接続情報を用意する
 
