@@ -71,6 +71,11 @@ DELETE /users/{userId}/tasks/{taskId}
 - メソッドには `/** */` で概要を1文、空行、`@param`、`@return`、必要に応じて `@throws` を記載する
 - `@param`、`@return`、`@throws` は対象が存在する場合のみ記載する
 
+## テストルール
+
+- `backend/src/test/` 配下のテスト固有ルールは `backend/src/test/AGENTS.md` を参照する
+- テスト作業時は、このファイルと対象ディレクトリに最も近い `AGENTS.md` の両方に従う
+
 ## API挙動ルール
 
 - 存在しない / 他ユーザーのリソース / 論理削除済みデータ → 404 Not Found
