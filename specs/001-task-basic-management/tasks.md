@@ -2,13 +2,13 @@
 
 **入力**: `/specs/001-task-basic-management/` の設計ドキュメント
 **前提**: plan.md, spec.md, research.md, data-model.md, contracts/openapi.yaml, quickstart.md
-**テスト**: FR-014 により、登録、一覧、詳細、更新、削除、バリデーション、共通エラー、JST 時刻表現の backend 単体テストと統合テストを含める。
+**テスト**: FR-014 により、登録、一覧、詳細、更新、削除、バリデーション、共通エラー、JST 時刻表現の backend 単体テストと統合テストを含める。Repository/JPA の既知データ投入には DBUnit を使う。
 **対象**: backend REST API のみ。frontend 接続は今回の実装対象に含めない。
 
 ## テスト方針と命名規約
 
 - **単体テスト**: product class ごとに `プロダクトクラス名 + Test` として作成する。例: `TaskServiceTest`、`JstDateTimeFormatterTest`、`GlobalExceptionHandlerTest`。
-- **統合テスト**: Spring context、MockMvc、JPA、PostgreSQL Testcontainers など複数境界を使う検証は `XXXIntegrationTest` として作成する。例: `TaskCreateIntegrationTest`、`TaskRepositoryIntegrationTest`。
+- **統合テスト**: Spring context、MockMvc、JPA、DBUnit など複数境界を使う検証は `XXXIntegrationTest` として作成する。例: `TaskCreateIntegrationTest`、`TaskRepositoryIntegrationTest`。
 - 各ユーザーストーリーは、Service などの単体テストと API/DB 境界を含む統合テストの両方で独立検証できるようにする。
 
 ## 形式: `[ID] [P?] [Story] 説明`
@@ -23,10 +23,10 @@
 
 **目的**: backend API 実装に必要な依存関係、DB 設定、時刻基盤を整える。
 
-- [ ] T001 `backend/pom.xml` に Spring Data JPA、Spring Validation、PostgreSQL JDBC Driver、PostgreSQL Testcontainers、JUnit Jupiter Testcontainers 依存関係を追加する
-- [ ] T002 `backend/src/main/resources/application.yaml` に環境変数参照の PostgreSQL datasource と JPA 設定を追加する
-- [ ] T003 [P] `backend/src/test/resources/application-test.yaml` に backend テスト用 profile 設定を追加する
-- [ ] T004 [P] `backend/src/main/java/com/example/taskapp/common/config/TimeConfig.java` に `ZoneId.of("Asia/Tokyo")` と `Clock` Bean を定義する
+- [X] T001 `backend/pom.xml` に Spring Data JPA、Spring Validation、PostgreSQL JDBC Driver、DBUnit、H2 テスト依存関係を追加する
+- [X] T002 `backend/src/main/resources/application.yaml` に環境変数参照の PostgreSQL datasource と JPA 設定を追加する
+- [X] T003 [P] `backend/src/test/resources/application-test.yaml` に backend テスト用 profile 設定を追加する
+- [X] T004 [P] `backend/src/main/java/com/example/taskapp/common/config/TimeConfig.java` に `ZoneId.of("Asia/Tokyo")` と `Clock` Bean を定義する
 
 ---
 
@@ -36,17 +36,17 @@
 
 **重要**: このフェーズが完了するまで、ユーザーストーリー作業を開始しない。
 
-- [ ] T005 [P] `backend/src/main/java/com/example/taskapp/task/domain/TaskStatus.java` に `TODO`、`DOING`、`DONE` のみを持つ enum を作成する
-- [ ] T006 `backend/src/main/java/com/example/taskapp/task/domain/Task.java` に `id`、`userId`、`title`、`description`、`status`、`deleted`、`createdAt`、`updatedAt` を持つ JPA Entity を作成する
-- [ ] T007 [P] `backend/src/main/java/com/example/taskapp/common/exception/ErrorDetail.java` に共通エラー詳細 DTO を作成する
-- [ ] T008 [P] `backend/src/main/java/com/example/taskapp/common/exception/ErrorResponse.java` に `code`、`message`、`details` を持つ共通エラー DTO を作成する
-- [ ] T009 [P] `backend/src/main/java/com/example/taskapp/common/exception/TaskNotFoundException.java` に task 未検出用例外を作成する
-- [ ] T010 `backend/src/main/java/com/example/taskapp/task/repository/TaskRepository.java` に `findByIdAndUserIdAndDeletedFalse` と `findAllByUserIdAndDeletedFalseOrderByCreatedAtDesc` を持つ Spring Data JPA repository を作成する
-- [ ] T011 `backend/src/main/java/com/example/taskapp/common/exception/GlobalExceptionHandler.java` に validation、JSON parse、`TaskNotFoundException`、想定外例外の共通ハンドリングを実装する
-- [ ] T012 [P] `backend/src/main/java/com/example/taskapp/common/util/JstDateTimeFormatter.java` に `Instant` を JST オフセット付き ISO-8601 文字列へ変換する utility を作成する
-- [ ] T013 [P] `backend/src/test/java/com/example/taskapp/common/util/JstDateTimeFormatterTest.java` に JST オフセット付き ISO-8601 変換の単体テストを追加する
-- [ ] T014 [P] `backend/src/test/java/com/example/taskapp/task/repository/TaskRepositoryIntegrationTest.java` に PostgreSQL Testcontainers を使った userId scope と logical delete の統合テストを追加する
-- [ ] T015 [P] `backend/src/test/java/com/example/taskapp/common/exception/GlobalExceptionHandlerTest.java` に 400、404、500 が `ErrorResponse` 形式になる共通例外ハンドリングの単体テストを追加する
+- [X] T005 [P] `backend/src/main/java/com/example/taskapp/task/domain/TaskStatus.java` に `TODO`、`DOING`、`DONE` のみを持つ enum を作成する
+- [X] T006 `backend/src/main/java/com/example/taskapp/task/domain/Task.java` に `id`、`userId`、`title`、`description`、`status`、`deleted`、`createdAt`、`updatedAt` を持つ JPA Entity を作成する
+- [X] T007 [P] `backend/src/main/java/com/example/taskapp/common/exception/ErrorDetail.java` に共通エラー詳細 DTO を作成する
+- [X] T008 [P] `backend/src/main/java/com/example/taskapp/common/exception/ErrorResponse.java` に `code`、`message`、`details` を持つ共通エラー DTO を作成する
+- [X] T009 [P] `backend/src/main/java/com/example/taskapp/common/exception/TaskNotFoundException.java` に task 未検出用例外を作成する
+- [X] T010 `backend/src/main/java/com/example/taskapp/task/repository/TaskRepository.java` に `findByIdAndUserIdAndDeletedFalse` と `findAllByUserIdAndDeletedFalseOrderByCreatedAtDesc` を持つ Spring Data JPA repository を作成する
+- [X] T011 `backend/src/main/java/com/example/taskapp/common/exception/GlobalExceptionHandler.java` に validation、JSON parse、`TaskNotFoundException`、想定外例外の共通ハンドリングを実装する
+- [X] T012 [P] `backend/src/main/java/com/example/taskapp/common/util/JstDateTimeFormatter.java` に `Instant` を JST オフセット付き ISO-8601 文字列へ変換する utility を作成する
+- [X] T013 [P] `backend/src/test/java/com/example/taskapp/common/util/JstDateTimeFormatterTest.java` に JST オフセット付き ISO-8601 変換の単体テストを追加する
+- [X] T014 [P] `backend/src/test/java/com/example/taskapp/task/repository/TaskRepositoryIntegrationTest.java` に DBUnit を使った userId scope と logical delete の統合テストを追加する
+- [X] T015 [P] `backend/src/test/java/com/example/taskapp/common/exception/GlobalExceptionHandlerTest.java` に 400、404、500 が `ErrorResponse` 形式になる共通例外ハンドリングの単体テストを追加する
 
 **チェックポイント**: Task の永続化、userId scope、論理削除、共通エラー、JST 変換の土台ができ、各ストーリーを実装できる。
 
@@ -60,16 +60,16 @@
 
 ### ユーザーストーリー 1 のテスト
 
-- [ ] T016 [P] [US1] `backend/src/test/java/com/example/taskapp/task/service/TaskServiceTest.java` に固定 `Clock` と mock repository を使った `createTask` の単体テストを追加する
-- [ ] T017 [P] [US1] `backend/src/test/java/com/example/taskapp/task/controller/TaskCreateIntegrationTest.java` に POST 正常系、userId 空文字・空白のみ、不正 status、必須項目不足、JST timestamp の MockMvc 統合テストを追加する
+- [X] T016 [P] [US1] `backend/src/test/java/com/example/taskapp/task/service/TaskServiceTest.java` に固定 `Clock` と mock repository を使った `createTask` の単体テストを追加する
+- [X] T017 [P] [US1] `backend/src/test/java/com/example/taskapp/task/controller/TaskCreateIntegrationTest.java` に POST 正常系、userId 空文字・空白のみ、不正 status、必須項目不足、JST timestamp の MockMvc 統合テストを追加する
 
 ### ユーザーストーリー 1 の実装
 
-- [ ] T018 [P] [US1] `backend/src/main/java/com/example/taskapp/task/dto/TaskCreateRequest.java` に `title` の `@NotBlank` 相当 validation、`status` の validation、任意 `description` を持つ登録 request DTO を作成する
-- [ ] T019 [P] [US1] `backend/src/main/java/com/example/taskapp/task/dto/TaskResponse.java` に `id`、`userId`、`title`、`description`、`status`、`createdAt`、`updatedAt` を持つ response DTO を作成する
-- [ ] T020 [US1] `backend/src/main/java/com/example/taskapp/task/dto/TaskResponseMapper.java` に `Task` から `TaskResponse` へ JST timestamp 付きで変換する mapper を作成する
-- [ ] T021 [US1] `backend/src/main/java/com/example/taskapp/task/service/TaskService.java` に `createTask(String userId, TaskCreateRequest request)` と transaction boundary を実装する
-- [ ] T022 [US1] `backend/src/main/java/com/example/taskapp/task/controller/TaskController.java` に `@NotBlank` 相当の `userId` path validation を含む `POST /users/{userId}/tasks` を追加し、成功時に 201 Created と `TaskResponse` を返す
+- [X] T018 [P] [US1] `backend/src/main/java/com/example/taskapp/task/dto/TaskCreateRequest.java` に `title` の `@NotBlank` 相当 validation、`status` の validation、任意 `description` を持つ登録 request DTO を作成する
+- [X] T019 [P] [US1] `backend/src/main/java/com/example/taskapp/task/dto/TaskResponse.java` に `id`、`userId`、`title`、`description`、`status`、`createdAt`、`updatedAt` を持つ response DTO を作成する
+- [X] T020 [US1] `backend/src/main/java/com/example/taskapp/task/dto/TaskResponseMapper.java` に `Task` から `TaskResponse` へ JST timestamp 付きで変換する mapper を作成する
+- [X] T021 [US1] `backend/src/main/java/com/example/taskapp/task/service/TaskService.java` に `createTask(String userId, TaskCreateRequest request)` と transaction boundary を実装する
+- [X] T022 [US1] `backend/src/main/java/com/example/taskapp/task/controller/TaskController.java` に `@NotBlank` 相当の `userId` path validation を含む `POST /users/{userId}/tasks` を追加し、成功時に 201 Created と `TaskResponse` を返す
 
 **チェックポイント**: ユーザーストーリー 1 が単体で動作し、MVP として登録 API を検証できる。
 
