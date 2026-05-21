@@ -4,7 +4,6 @@
 
 `backend/` 配下のJava / Spring Bootアプリケーションに適用する。
 
-
 ## 技術スタック
 
 - Java: 25
@@ -31,11 +30,11 @@ com.example.taskapp
 
 ## レイヤ責務
 
-- controller: HTTPリクエスト受け取り・レスポンス返却
-- service: ビジネスロジック・トランザクション管理
-- domain: Entity / Enum
-- repository: DBアクセス
-- dto: API入出力
+- controller: HTTPリクエストを受け取り、DTOを介してserviceを呼び出し、HTTPレスポンスを返す
+- service: ユースケースの実行、トランザクション管理、repositoryの呼び出し、domainへの処理委譲を行う
+- domain: Entity / Enum / Value Objectを配置し、業務ルールや状態変更を表現する
+- repository: Entityの永続化・取得を担当し、DBアクセスを抽象化する
+- dto: APIのリクエスト・レスポンス用の型を定義する
 
 ## API設計ルール
 
@@ -45,8 +44,7 @@ com.example.taskapp
 - `userId` をパスに含める
 
 ```text
-GET    /users/{userId}/tasks
-GET    /users/{userId}/tasks/{taskId}
+GET    /users/{userId}/tasks、/users/{userId}/tasks/{taskId}
 POST   /users/{userId}/tasks
 PUT    /users/{userId}/tasks/{taskId}
 DELETE /users/{userId}/tasks/{taskId}
@@ -54,34 +52,30 @@ DELETE /users/{userId}/tasks/{taskId}
 
 ## 実装ルール
 
-- controllerはserviceのみ呼び出す
-- serviceはrepositoryのみ呼び出す
-- DTOとEntityは分離する
-- 例外は共通ハンドリングを使用する
-- バリデーションはDTOで受け、Serviceで業務ルールを確認する
+- controllerはDTOを受け取り、serviceを呼び出し、DTOを返す（直接repositoryを呼び出さない）
+- serviceはrepositoryを通じてEntityを取得・保存し、業務ルールはdomainに委譲する
+- serviceからcontrollerや他モジュールのrepositoryを直接呼び出さない
+- DTOとEntityは分離し、domainはDTOに依存しない
+- 例外は@RestControllerAdviceで共通ハンドリングする
+- 入力値の形式チェックはDTO、ユースケース判断はservice、状態変更ルールはdomainで行う
 - 削除は `deleted` フラグによる論理削除とする
-- `created_at` / `updated_at` を持つ
+- 削除は `deleted` フラグによる論理削除とし、通常の取得・一覧・更新では `deleted = false` のデータのみ対象とする
+- Entityは `createdAt` / `updatedAt` を持ち、DBカラムは `created_at` / `updated_at` とする
 
 ## コメント / Javadoc方針
 
-- コメントは一般的で簡潔な内容にする
-- 1文は長くなりすぎないようにし、できるだけ1行に収める
+- コメントは一般的で簡潔な内容にする（長くなりすぎないようにできるだけ1行に収める）
 - クラスには `/** */` で概要を1文記載する
 - フィールドには `//` で内容が一言でわかる説明を記載する
 - メソッドには `/** */` で概要を1文、空行、`@param`、`@return`、必要に応じて `@throws` を記載する
-- `@param`、`@return`、`@throws` は対象が存在する場合のみ記載する
 
 ## テストルール
 
 - `backend/src/test/` 配下のテスト固有ルールは `backend/src/test/AGENTS.md` を参照する
-- テスト作業時は、このファイルと対象ディレクトリに最も近い `AGENTS.md` の両方に従う
 
 ## API挙動ルール
 
-- 存在しない / 他ユーザーのリソース / 論理削除済みデータ → 404 Not Found
-- 作成時、status未指定の場合は TODO を設定する
 - 更新は部分更新とする（未指定項目は変更しない）
-- 削除は論理削除とする（deleted = true）
 - 削除成功時は 204 No Content を返却する
 
 ## エラーハンドリングルール
@@ -90,8 +84,8 @@ DELETE /users/{userId}/tasks/{taskId}
 
 | HTTPステータス | ケース |
 |---|---|
-| 404 Not Found | 存在しないタスクID / 論理削除済みタスクへのアクセス / 他ユーザーのリソース |
 | 400 Bad Request | リクエストボディ・パスパラメータの入力値不正（バリデーションエラー） |
+| 404 Not Found | 存在しないタスクID / 論理削除済みタスクへのアクセス / 他ユーザーのリソース |
 | 405 Method Not Allowed | 許可されていないHTTPメソッド |
 | 500 Internal Server Error | サーバー内部エラー |
 
@@ -107,7 +101,6 @@ DELETE /users/{userId}/tasks/{taskId}
 ## ドメインルール
 
 Taskのstatusは以下のみ使用する。
-
-- TODO
+- TODO（作成時、status未指定）
 - DOING
 - DONE
