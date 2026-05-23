@@ -38,6 +38,7 @@ class TaskRepositoryIntegrationTest {
 
 	@BeforeEach
 	void setUpDatabase() throws Exception {
+		// Arrange
 		try (Connection connection = dataSource.getConnection();
 				InputStream dataset = new ClassPathResource("/dbunit/tasks.xml").getInputStream()) {
 			DatabaseConnection dbUnitConnection = new DatabaseConnection(connection);
@@ -50,32 +51,40 @@ class TaskRepositoryIntegrationTest {
 	@Test
 	@DisplayName("ユーザーの未削除タスクを作成日時の降順で取得する")
 	void findAllByUserIdAndDeletedFalseOrderByCreatedAtDescReturnsUserTasksInCreatedAtDesc() {
+		// Act
 		List<Task> tasks = taskRepository.findAllByUserIdAndDeletedFalseOrderByCreatedAtDesc("user-1");
 
+		// Assert
 		assertThat(tasks).extracting(Task::getId).containsExactly(2L, 1L);
 	}
 
 	@Test
 	@DisplayName("指定したユーザーの未削除タスクを取得する")
 	void findByIdAndUserIdAndDeletedFalseReturnsVisibleTaskForUser() {
+		// Act
 		Optional<Task> found = taskRepository.findByIdAndUserIdAndDeletedFalse(1L, "user-1");
 
+		// Assert
 		assertThat(found).hasValueSatisfying(task -> assertThat(task.getId()).isEqualTo(1L));
 	}
 
 	@Test
 	@DisplayName("他ユーザーのタスクは取得しない")
 	void findByIdAndUserIdAndDeletedFalseReturnsEmptyForOtherUserTask() {
+		// Act
 		Optional<Task> scopedOut = taskRepository.findByIdAndUserIdAndDeletedFalse(4L, "user-1");
 
+		// Assert
 		assertThat(scopedOut).isEmpty();
 	}
 
 	@Test
 	@DisplayName("論理削除済みタスクは取得しない")
 	void findByIdAndUserIdAndDeletedFalseReturnsEmptyForDeletedTask() {
+		// Act
 		Optional<Task> deletedOut = taskRepository.findByIdAndUserIdAndDeletedFalse(3L, "user-1");
 
+		// Assert
 		assertThat(deletedOut).isEmpty();
 	}
 }

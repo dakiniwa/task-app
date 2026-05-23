@@ -39,6 +39,7 @@ class GlobalExceptionHandlerTest {
 
 	@BeforeEach
 	void setUp() {
+		// Arrange
 		LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
 		validator.afterPropertiesSet();
 
@@ -57,6 +58,7 @@ class GlobalExceptionHandlerTest {
 		@Test
 		@DisplayName("request body の validation error を共通エラーレスポンスに変換する")
 		void requestBodyValidationErrorReturnsBadRequestErrorResponse() throws Exception {
+			// Act & Assert
 			mockMvc.perform(post("/body-validation")
 					.contentType(MediaType.APPLICATION_JSON)
 					.content("{\"name\":\"\"}"))
@@ -69,6 +71,7 @@ class GlobalExceptionHandlerTest {
 		@Test
 		@DisplayName("constraint violation を共通エラーレスポンスに変換する")
 		void constraintViolationReturnsBadRequestErrorResponse() throws Exception {
+			// Act & Assert
 			mockMvc.perform(get("/parameter-validation")
 					.param("name", ""))
 				.andExpect(status().isBadRequest())
@@ -80,6 +83,7 @@ class GlobalExceptionHandlerTest {
 		@Test
 		@DisplayName("JSON parse error を共通エラーレスポンスに変換する")
 		void malformedJsonReturnsBadRequestErrorResponse() throws Exception {
+			// Act & Assert
 			mockMvc.perform(post("/body-validation")
 					.contentType(MediaType.APPLICATION_JSON)
 					.content("{\"name\":"))
@@ -96,6 +100,7 @@ class GlobalExceptionHandlerTest {
 		@Test
 		@DisplayName("TaskNotFoundException を共通エラーレスポンスに変換する")
 		void taskNotFoundReturnsNotFoundErrorResponse() throws Exception {
+			// Act & Assert
 			mockMvc.perform(get("/not-found"))
 				.andExpect(status().isNotFound())
 				.andExpect(errorResponse(404, "タスクが見つかりません"))
@@ -110,6 +115,7 @@ class GlobalExceptionHandlerTest {
 		@Test
 		@DisplayName("想定外例外を共通エラーレスポンスに変換する")
 		void unexpectedErrorReturnsInternalServerErrorResponse() throws Exception {
+			// Act & Assert
 			mockMvc.perform(get("/internal-error"))
 				.andExpect(status().isInternalServerError())
 				.andExpect(errorResponse(500, "サーバー内部エラーが発生しました"))
@@ -119,6 +125,7 @@ class GlobalExceptionHandlerTest {
 		@Test
 		@DisplayName("想定外例外の内部メッセージをレスポンスに露出しない")
 		void unexpectedErrorDoesNotExposeInternalMessage() throws Exception {
+			// Act & Assert
 			mockMvc.perform(get("/internal-error"))
 				.andExpect(status().isInternalServerError())
 				.andExpect(content().string(not(containsString("boom"))));

@@ -13,10 +13,10 @@ import com.example.taskapp.task.dto.TaskResponseMapper;
 import com.example.taskapp.task.repository.TaskRepository;
 
 /**
- * タスクの業務処理を扱います。
+ * タスク登録の業務処理を扱います。
  */
 @Service
-public class TaskService {
+public class TaskCreateService {
 
 	// タスクリポジトリ
 	private final TaskRepository taskRepository;
@@ -34,7 +34,7 @@ public class TaskService {
 	 * @param taskResponseMapper タスクレスポンスマッパー
 	 * @param clock クロック
 	 */
-	public TaskService(TaskRepository taskRepository, TaskResponseMapper taskResponseMapper, Clock clock) {
+	public TaskCreateService(TaskRepository taskRepository, TaskResponseMapper taskResponseMapper, Clock clock) {
 		this.taskRepository = taskRepository;
 		this.taskResponseMapper = taskResponseMapper;
 		this.clock = clock;

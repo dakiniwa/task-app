@@ -16,16 +16,20 @@ class JstDateTimeFormatterTest {
 	@Test
 	@DisplayName("Instant を JST オフセット付き ISO-8601 文字列に変換する")
 	void formatConvertsInstantToJstOffsetDateTime() {
+		// Act
 		String formatted = formatter.format(Instant.parse("2026-05-09T01:30:00Z"));
 
+		// Assert
 		assertThat(formatted).isEqualTo("2026-05-09T10:30:00+09:00");
 	}
 
 	@Test
 	@DisplayName("日付をまたぐ場合もシステムデフォルトタイムゾーンに依存せず JST で変換する")
 	void formatDoesNotDependOnSystemDefaultZone() {
+		// Act
 		String formatted = formatter.format(Instant.parse("2026-12-31T15:00:00Z"));
 
+		// Assert
 		assertThat(formatted).isEqualTo("2027-01-01T00:00:00+09:00");
 	}
 }

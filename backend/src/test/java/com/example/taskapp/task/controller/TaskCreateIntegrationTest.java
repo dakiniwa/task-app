@@ -34,6 +34,7 @@ class TaskCreateIntegrationTest {
 
 	@BeforeEach
 	void setUp() {
+		// Arrange
 		taskRepository.deleteAll();
 	}
 
@@ -44,6 +45,7 @@ class TaskCreateIntegrationTest {
 		@Test
 		@DisplayName("有効なリクエストで作成したタスクを返す")
 		void createTaskReturnsCreatedTask() throws Exception {
+			// Act & Assert
 			mockMvc.perform(post("/users/user-1/tasks")
 					.contentType(MediaType.APPLICATION_JSON)
 					.content("""
@@ -69,6 +71,7 @@ class TaskCreateIntegrationTest {
 		@Test
 		@DisplayName("userId が空白のみの場合は共通エラーレスポンスを返す")
 		void createTaskRejectsBlankUserId() throws Exception {
+			// Act & Assert
 			mockMvc.perform(post("/users/{userId}/tasks", " ")
 					.contentType(MediaType.APPLICATION_JSON)
 					.content("""
@@ -83,6 +86,7 @@ class TaskCreateIntegrationTest {
 		@Test
 		@DisplayName("不正な status の場合は共通エラーレスポンスを返す")
 		void createTaskRejectsInvalidStatus() throws Exception {
+			// Act & Assert
 			mockMvc.perform(post("/users/user-1/tasks")
 					.contentType(MediaType.APPLICATION_JSON)
 					.content("""
@@ -96,6 +100,7 @@ class TaskCreateIntegrationTest {
 		@Test
 		@DisplayName("必須項目が不足している場合は共通エラーレスポンスを返す")
 		void createTaskRejectsMissingRequiredFields() throws Exception {
+			// Act & Assert
 			mockMvc.perform(post("/users/user-1/tasks")
 					.contentType(MediaType.APPLICATION_JSON)
 					.content("""

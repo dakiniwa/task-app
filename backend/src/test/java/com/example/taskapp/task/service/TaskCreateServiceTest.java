@@ -9,7 +9,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,8 +28,8 @@ import com.example.taskapp.task.dto.TaskResponseMapper;
 import com.example.taskapp.task.repository.TaskRepository;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("TaskService")
-class TaskServiceTest {
+@DisplayName("TaskCreateService")
+class TaskCreateServiceTest {
 
 	private static final ZoneId JST = ZoneId.of("Asia/Tokyo");
 	private static final Instant FIXED_NOW = Instant.parse("2026-05-09T01:30:00Z");
@@ -45,22 +44,18 @@ class TaskServiceTest {
 	private TaskResponseMapper taskResponseMapper = new TaskResponseMapper(new JstDateTimeFormatter(JST));
 
 	@InjectMocks
-	private TaskService taskService;
-
-	@BeforeEach
-	void setUp() {
-		when(clock.instant()).thenReturn(FIXED_NOW);
-	}
+	private TaskCreateService taskCreateService;
 
 	@Test
 	@DisplayName("リクエスト内容と固定時刻でタスクを保存する")
 	void createTaskSavesTaskWithRequestValuesAndFixedClock() {
 		// Arrange
+		stubFixedClock();
 		Task savedTask = savedTaskReturnedByRepository();
 		when(taskRepository.save(any(Task.class))).thenReturn(savedTask);
 
 		// Act
-		taskService.createTask("user-1", validCreateRequest());
+		taskCreateService.createTask("user-1", validCreateRequest());
 
 		// Assert
 		ArgumentCaptor<Task> taskCaptor = ArgumentCaptor.forClass(Task.class);
@@ -80,11 +75,12 @@ class TaskServiceTest {
 	@DisplayName("作成したタスクを JST timestamp 付きレスポンスとして返す")
 	void createTaskReturnsCreatedTaskResponseWithJstTimestamp() {
 		// Arrange
+		stubFixedClock();
 		Task savedTask = savedTaskReturnedByRepository();
 		when(taskRepository.save(any(Task.class))).thenReturn(savedTask);
 
 		// Act
-		TaskResponse response = taskService.createTask("user-1", validCreateRequest());
+		TaskResponse response = taskCreateService.createTask("user-1", validCreateRequest());
 
 		// Assert
 		assertThat(response.id()).isEqualTo(1L);
@@ -94,6 +90,13 @@ class TaskServiceTest {
 		assertThat(response.status()).isEqualTo(TaskStatus.TODO);
 		assertThat(response.createdAt()).isEqualTo("2026-05-09T10:30:00+09:00");
 		assertThat(response.updatedAt()).isEqualTo("2026-05-09T10:30:00+09:00");
+	}
+
+	/**
+	 * 固定時刻を返すクロックに設定します。
+	 */
+	private void stubFixedClock() {
+		when(clock.instant()).thenReturn(FIXED_NOW);
 	}
 
 	/**
