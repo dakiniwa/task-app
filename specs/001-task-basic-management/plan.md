@@ -29,7 +29,7 @@
 - **バックエンドAPI先行**: PASS。本計画は backend REST API、永続化、DTO、共通エラー、API検証を対象とし、frontend 接続は後続に残す。
 - **REST/user scope**: PASS。対象 API は `GET/POST /users/{userId}/tasks` と `GET/PUT/DELETE /users/{userId}/tasks/{taskId}`。動詞パスは使わない。
 - **ドメイン不変条件**: PASS。Task status は `TODO` / `DOING` / `DONE` のみ。削除は論理削除。Task は `userId`、`createdAt`、`updatedAt` を保持する。API 応答の timestamp は JST オフセット付き ISO-8601 とする。
-- **境界分離**: PASS。Entity/Enum は `domain`、DTO は `dto`、HTTP は `controller`、業務ロジックは `service`、DBアクセスは `repository` に分離する。
+- **境界分離**: PASS。Entity/Enum は `domain`、DTO は `dto`、HTTP は `controller`、業務ロジックは `service`、DBアクセスは `repository` に分離する。`service` と `controller` は CRUD 集約クラスにせず、登録・読み取り・更新・削除のユースケース単位に分ける。
 - **バリデーションと観測性**: PASS。DTO の入力検証、Service の所有者/削除状態検証、共通例外ハンドリング、主要 4xx/5xx のログ方針、正常系/異常系テストを計画に含める。
 - **日本語成果物**: PASS。`plan.md`、`research.md`、`data-model.md`、`quickstart.md`、`contracts/` 配下の説明は日本語で作成する。
 - **Jiraブランチ運用**: PASS。この計画は親ブランチ `feature/SCRUM-6` 上で作成する。サブタスク実装は `/speckit-tasks` 後、各実装開始直前に `feature/sub/SCRUM-16` から `feature/sub/SCRUM-23` の単位で切る。
@@ -80,6 +80,29 @@ frontend/
 
 **構成判断**: 今回の対象は backend API のみとする。`backend/AGENTS.md` のモジュラモノリス構成に合わせ、Task 関連コードは `com.example.taskapp.task` 配下へ、共通例外は `com.example.taskapp.common.exception` 配下へ配置する。Frontend は API 契約確定後に接続するため、この計画では実装対象に含めない。
 
+### ユースケース単位の責務分離
+
+Task の API 契約は `contracts/openapi.yaml` のまま維持し、実装クラスだけをユースケース単位に分ける。`TaskService` や `TaskController` のような CRUD 集約クラスへ登録・読み取り・更新・削除を追加し続けてはならない。
+
+```text
+backend/src/main/java/com/example/taskapp/task/
+├── controller/
+│   ├── TaskCreateController.java
+│   ├── TaskReadController.java
+│   ├── TaskUpdateController.java
+│   └── TaskDeleteController.java
+├── service/
+│   ├── TaskCreateService.java
+│   ├── TaskReadService.java
+│   ├── TaskUpdateService.java
+│   └── TaskDeleteService.java
+├── domain/
+├── repository/
+└── dto/
+```
+
+Controller は担当する HTTP 操作に対応する Service だけを呼び出し、Repository を直接呼び出さない。Service は担当ユースケースの transaction boundary と business rule のみを持つ。`TaskRepository`、DTO、mapper、共通例外は責務が明確な共有部品として維持してよい。
+
 ## Phase 0: 調査結果
 
 [research.md](./research.md) に記録した。未解決項目は残していない。
@@ -97,7 +120,7 @@ frontend/
 - **バックエンドAPI先行**: PASS。設計対象は backend API 契約と永続化境界であり、frontend 接続は含めていない。
 - **REST/user scope**: PASS。OpenAPI 契約は `userId` をすべての Task 操作パスに含め、動詞を含む URL を定義していない。
 - **ドメイン不変条件**: PASS。`TaskStatus` は `TODO` / `DOING` / `DONE` のみ、削除済み Task は通常取得・更新・削除対象から除外する。時刻方針は JST API 表現と server timezone 非依存を設計成果物に反映した。
-- **境界分離**: PASS。data model と contracts で Entity、DTO、ErrorResponse の責務を分けた。
+- **境界分離**: PASS。data model と contracts で Entity、DTO、ErrorResponse の責務を分けた。実装計画では、Task の登録・読み取り・更新・削除をユースケース単位の Service/Controller/Test に分割する方針を採用する。
 - **バリデーションと観測性**: PASS。OpenAPI と quickstart に必須入力、不正 status、404、削除後取得不可の確認を含めた。
 - **日本語成果物**: PASS。成果物本文は日本語で、識別子と API パスのみ原文表記を維持した。
 - **Jiraブランチ運用**: PASS。親ブランチで計画を確定し、サブタスク実装開始時に `feature/sub/SCRUM-x` を切る方針を明記した。

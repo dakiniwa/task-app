@@ -60,7 +60,13 @@
 - 根拠: FR-014 が登録、一覧、詳細、更新、削除、バリデーション、共通エラーの完了条件を確認できるテストを求めている。実装開始時の確認により、Repository/JPA の既知データ検証は PostgreSQL Testcontainers ではなく DBUnit へ変更する。
 - 検討した代替案: 手動 curl のみでは回帰検出が弱く、受け入れシナリオ 100% 確認の再現性が不足するため採用しない。
 
-## 11. ブランチ運用
+## 11. Service / Controller の責務分離
+
+- 決定: `TaskService` / `TaskController` のような CRUD 集約クラスは使わず、登録・読み取り・更新・削除のユースケース単位で `TaskCreateService`、`TaskReadService`、`TaskUpdateService`、`TaskDeleteService` と対応 Controller/Test を分ける。API path、HTTP method、response schema は `contracts/openapi.yaml` の定義から変更しない。
+- 根拠: 憲章の「境界の明確化と拡張性」は責務混在を避けることを求めている。登録、読み取り、更新、削除は変更理由が異なるため、同じ Service/Controller に追加し続けると単一責務を保てない。Repository、DTO、mapper、共通例外は責務が明確な共有部品として維持できる。
+- 検討した代替案: REST resource 単位で `TaskController` と `TaskService` に集約する案は、初期実装は短くなるが、Phase5 以降で update/delete が追加されると変更理由が混在し、product class ごとのテストも集約されるため採用しない。
+
+## 12. ブランチ運用
 
 - 決定: `plan.md` と設計成果物は親ブランチ `feature/SCRUM-6` に置く。サブタスク実装は `/speckit-tasks` 後、実装開始直前に `feature/sub/SCRUM-16` から `feature/sub/SCRUM-23` の単位で切る。
 - 根拠: 憲章とルート `AGENTS.md` が、メインタスクは `feature/SCRUM-x`、サブタスクは `feature/sub/SCRUM-x` と定義している。設計成果物を親に集約すると、各サブタスクが同じ契約を参照できる。
