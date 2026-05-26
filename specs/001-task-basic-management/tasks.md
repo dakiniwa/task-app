@@ -7,9 +7,10 @@
 
 ## テスト方針と命名規約
 
-- **単体テスト**: product class ごとに `プロダクトクラス名 + Test` として作成する。例: `TaskServiceTest`、`JstDateTimeFormatterTest`、`GlobalExceptionHandlerTest`。
+- **単体テスト**: product class ごとに `プロダクトクラス名 + Test` として作成する。例: `TaskCreateServiceTest`、`TaskReadServiceTest`、`JstDateTimeFormatterTest`、`GlobalExceptionHandlerTest`。
 - **統合テスト**: Spring context、MockMvc、JPA、DBUnit など複数境界を使う検証は `XXXIntegrationTest` として作成する。例: `TaskCreateIntegrationTest`、`TaskRepositoryIntegrationTest`。
 - 各ユーザーストーリーは、Service などの単体テストと API/DB 境界を含む統合テストの両方で独立検証できるようにする。
+- `TaskService` / `TaskController` のような CRUD 集約クラスは作らず、登録・読み取り・更新・削除のユースケース単位で Service / Controller / Test を分ける。
 
 ## 形式: `[ID] [P?] [Story] 説明`
 
@@ -60,7 +61,7 @@
 
 ### ユーザーストーリー 1 のテスト
 
-- [X] T016 [P] [US1] `backend/src/test/java/com/example/taskapp/task/service/TaskServiceTest.java` に固定 `Clock` と mock repository を使った `createTask` の単体テストを追加する
+- [X] T016 [P] [US1] `backend/src/test/java/com/example/taskapp/task/service/TaskServiceTest.java` に固定 `Clock` と mock repository を使った `createTask` の単体テストを追加する。Phase 4 責務分離リファクタリングの T040 で `TaskCreateServiceTest.java` へ分割する
 - [X] T017 [P] [US1] `backend/src/test/java/com/example/taskapp/task/controller/TaskCreateIntegrationTest.java` に POST 正常系、userId 空文字・空白のみ、不正 status、必須項目不足、JST timestamp の MockMvc 統合テストを追加する
 
 ### ユーザーストーリー 1 の実装
@@ -68,8 +69,8 @@
 - [X] T018 [P] [US1] `backend/src/main/java/com/example/taskapp/task/dto/TaskCreateRequest.java` に `title` の `@NotBlank` 相当 validation、`status` の validation、任意 `description` を持つ登録 request DTO を作成する
 - [X] T019 [P] [US1] `backend/src/main/java/com/example/taskapp/task/dto/TaskResponse.java` に `id`、`userId`、`title`、`description`、`status`、`createdAt`、`updatedAt` を持つ response DTO を作成する
 - [X] T020 [US1] `backend/src/main/java/com/example/taskapp/task/dto/TaskResponseMapper.java` に `Task` から `TaskResponse` へ JST timestamp 付きで変換する mapper を作成する
-- [X] T021 [US1] `backend/src/main/java/com/example/taskapp/task/service/TaskService.java` に `createTask(String userId, TaskCreateRequest request)` と transaction boundary を実装する
-- [X] T022 [US1] `backend/src/main/java/com/example/taskapp/task/controller/TaskController.java` に `@NotBlank` 相当の `userId` path validation を含む `POST /users/{userId}/tasks` を追加し、成功時に 201 Created と `TaskResponse` を返す
+- [X] T021 [US1] `backend/src/main/java/com/example/taskapp/task/service/TaskService.java` に `createTask(String userId, TaskCreateRequest request)` と transaction boundary を実装する。Phase 4 責務分離リファクタリングの T041 で `TaskCreateService.java` へ分割する
+- [X] T022 [US1] `backend/src/main/java/com/example/taskapp/task/controller/TaskController.java` に `@NotBlank` 相当の `userId` path validation を含む `POST /users/{userId}/tasks` を追加し、成功時に 201 Created と `TaskResponse` を返す。Phase 4 責務分離リファクタリングの T042 で `TaskCreateController.java` へ分割する
 
 **チェックポイント**: ユーザーストーリー 1 が単体で動作し、MVP として登録 API を検証できる。
 
@@ -83,13 +84,22 @@
 
 ### ユーザーストーリー 2 のテスト
 
-- [ ] T023 [US2] `backend/src/test/java/com/example/taskapp/task/service/TaskServiceTest.java` に `listTasks` と `getTask` の userId scope、deleted 除外、404 の単体テストを追加する
-- [ ] T024 [P] [US2] `backend/src/test/java/com/example/taskapp/task/controller/TaskQueryIntegrationTest.java` に list/detail の正常系、userId 空文字・空白のみ、別 userId 除外、deleted 除外、404 の MockMvc 統合テストを追加する
+- [X] T023 [US2] `backend/src/test/java/com/example/taskapp/task/service/TaskServiceTest.java` に `listTasks` と `getTask` の userId scope、deleted 除外、404 の単体テストを追加する。Phase 4 責務分離リファクタリングの T040 で `TaskReadServiceTest.java` へ分割する
+- [X] T024 [P] [US2] `backend/src/test/java/com/example/taskapp/task/controller/TaskQueryIntegrationTest.java` に list/detail の正常系、userId 空文字・空白のみ、別 userId 除外、deleted 除外、404 の MockMvc 統合テストを追加する。Phase 4 責務分離リファクタリングの T043 で `TaskReadIntegrationTest.java` へ整理する
 
 ### ユーザーストーリー 2 の実装
 
-- [ ] T025 [US2] `backend/src/main/java/com/example/taskapp/task/service/TaskService.java` に `listTasks(String userId)` と `getTask(String userId, Long taskId)` を実装する
-- [ ] T026 [US2] `backend/src/main/java/com/example/taskapp/task/controller/TaskController.java` に `@NotBlank` 相当の `userId` path validation を含む `GET /users/{userId}/tasks` と `GET /users/{userId}/tasks/{taskId}` を追加する
+- [X] T025 [US2] `backend/src/main/java/com/example/taskapp/task/service/TaskService.java` に `listTasks(String userId)` と `getTask(String userId, Long taskId)` を実装する。Phase 4 責務分離リファクタリングの T041 で `TaskReadService.java` へ分割する
+- [X] T026 [US2] `backend/src/main/java/com/example/taskapp/task/controller/TaskController.java` に `@NotBlank` 相当の `userId` path validation を含む `GET /users/{userId}/tasks` と `GET /users/{userId}/tasks/{taskId}` を追加する。Phase 4 責務分離リファクタリングの T042 で `TaskReadController.java` へ分割する
+
+### Phase 4 責務分離リファクタリング
+
+**目的**: Phase 3/4 の登録・読み取り実装を、CRUD 集約ではなくユースケース単位の Service / Controller / Test へ揃える。T023-T026 の完了状態は、API 振る舞いの完了を示すものとして維持する。
+
+- [X] T040 [US1/US2] `backend/src/test/java/com/example/taskapp/task/service/TaskCreateServiceTest.java` と `backend/src/test/java/com/example/taskapp/task/service/TaskReadServiceTest.java` に単体テストを分割し、`TaskServiceTest` への追加をやめる
+- [X] T041 [US1/US2] `backend/src/main/java/com/example/taskapp/task/service/TaskCreateService.java` と `backend/src/main/java/com/example/taskapp/task/service/TaskReadService.java` に登録・読み取り処理を分割し、`TaskService` への CRUD 集約をやめる
+- [X] T042 [US1/US2] `backend/src/main/java/com/example/taskapp/task/controller/TaskCreateController.java` と `backend/src/main/java/com/example/taskapp/task/controller/TaskReadController.java` に endpoint を分割し、`TaskController` への CRUD 集約をやめる
+- [X] T043 [US1/US2] `backend/src/main/java/com/example/taskapp/task/service/TaskService.java` と `backend/src/main/java/com/example/taskapp/task/controller/TaskController.java` を削除し、`backend/src/test/java/com/example/taskapp/task/controller/TaskQueryIntegrationTest.java` を `TaskReadIntegrationTest.java` へ整理したうえで、`backend/src/test/java/com/example/taskapp/task/controller/TaskCreateIntegrationTest.java` と `backend/src/test/java/com/example/taskapp/task/controller/TaskReadIntegrationTest.java` が通ることを確認する
 
 **チェックポイント**: ユーザーストーリー 2 が単体テストと統合テストで検証でき、US1 と組み合わせても登録後の一覧・詳細確認ができる。
 
@@ -103,14 +113,14 @@
 
 ### ユーザーストーリー 3 のテスト
 
-- [ ] T027 [US3] `backend/src/test/java/com/example/taskapp/task/service/TaskServiceTest.java` に固定 `Clock` で `updateTask` が内容と `updatedAt` を更新する単体テストを追加する
+- [ ] T027 [US3] `backend/src/test/java/com/example/taskapp/task/service/TaskUpdateServiceTest.java` に固定 `Clock` で `updateTask` が内容と `updatedAt` を更新する単体テストを追加する
 - [ ] T028 [P] [US3] `backend/src/test/java/com/example/taskapp/task/controller/TaskUpdateIntegrationTest.java` に PUT 正常系、userId 空文字・空白のみ、必須項目不足、不正 status、404 の MockMvc 統合テストを追加する
 
 ### ユーザーストーリー 3 の実装
 
 - [ ] T029 [P] [US3] `backend/src/main/java/com/example/taskapp/task/dto/TaskUpdateRequest.java` に `title` の `@NotBlank` 相当 validation、`status` の validation、任意 `description` を持つ更新 request DTO を作成する
-- [ ] T030 [US3] `backend/src/main/java/com/example/taskapp/task/service/TaskService.java` に `updateTask(String userId, Long taskId, TaskUpdateRequest request)` を実装する
-- [ ] T031 [US3] `backend/src/main/java/com/example/taskapp/task/controller/TaskController.java` に `@NotBlank` 相当の `userId` path validation を含む `PUT /users/{userId}/tasks/{taskId}` を追加する
+- [ ] T030 [US3] `backend/src/main/java/com/example/taskapp/task/service/TaskUpdateService.java` に `updateTask(String userId, Long taskId, TaskUpdateRequest request)` を実装する
+- [ ] T031 [US3] `backend/src/main/java/com/example/taskapp/task/controller/TaskUpdateController.java` に `@NotBlank` 相当の `userId` path validation を含む `PUT /users/{userId}/tasks/{taskId}` を追加する
 
 **チェックポイント**: ユーザーストーリー 3 が単体テストと統合テストで検証でき、US1/US2 と組み合わせて登録、更新、確認の流れを検証できる。
 
@@ -124,13 +134,13 @@
 
 ### ユーザーストーリー 4 のテスト
 
-- [ ] T032 [US4] `backend/src/test/java/com/example/taskapp/task/service/TaskServiceTest.java` に `deleteTask` が `deleted=true` と `updatedAt` を更新する単体テストを追加する
+- [ ] T032 [US4] `backend/src/test/java/com/example/taskapp/task/service/TaskDeleteServiceTest.java` に `deleteTask` が `deleted=true` と `updatedAt` を更新する単体テストを追加する
 - [ ] T033 [P] [US4] `backend/src/test/java/com/example/taskapp/task/controller/TaskDeleteIntegrationTest.java` に DELETE 正常系、userId 空文字・空白のみ、削除後取得不可、404 の MockMvc 統合テストを追加する
 
 ### ユーザーストーリー 4 の実装
 
-- [ ] T034 [US4] `backend/src/main/java/com/example/taskapp/task/service/TaskService.java` に `deleteTask(String userId, Long taskId)` を実装し、物理削除ではなく `deleted=true` に更新する
-- [ ] T035 [US4] `backend/src/main/java/com/example/taskapp/task/controller/TaskController.java` に `@NotBlank` 相当の `userId` path validation を含む `DELETE /users/{userId}/tasks/{taskId}` を追加し、成功時に 204 No Content を返す
+- [ ] T034 [US4] `backend/src/main/java/com/example/taskapp/task/service/TaskDeleteService.java` に `deleteTask(String userId, Long taskId)` を実装し、物理削除ではなく `deleted=true` に更新する
+- [ ] T035 [US4] `backend/src/main/java/com/example/taskapp/task/controller/TaskDeleteController.java` に `@NotBlank` 相当の `userId` path validation を含む `DELETE /users/{userId}/tasks/{taskId}` を追加し、成功時に 204 No Content を返す
 
 **チェックポイント**: ユーザーストーリー 4 が単体テストと統合テストで検証でき、登録から論理削除までの主要操作が一通り成立する。
 
@@ -140,7 +150,7 @@
 
 **目的**: API 契約、quickstart、全体テスト、憲章制約を横断的に確認する。
 
-- [ ] T036 [P] `backend/src/main/java/com/example/taskapp/task/controller/TaskController.java` の HTTP method、path、status code、schema が `specs/001-task-basic-management/contracts/openapi.yaml` に一致することを確認して Controller を修正する。契約変更が必要な場合は `specs/001-task-basic-management/spec.md` と `specs/001-task-basic-management/plan.md` へ戻って更新する
+- [ ] T036 [P] `backend/src/main/java/com/example/taskapp/task/controller/` 配下の各 Controller の HTTP method、path、status code、schema が `specs/001-task-basic-management/contracts/openapi.yaml` に一致することを確認して Controller を修正する。契約変更が必要な場合は `specs/001-task-basic-management/spec.md` と `specs/001-task-basic-management/plan.md` へ戻って更新する
 - [ ] T037 [P] `specs/001-task-basic-management/quickstart.md` の curl シナリオを実装後 API に合わせて検証し、差分があれば同ファイルを更新する
 - [ ] T038 `backend/pom.xml` を基点に `cd backend && ./mvnw test` を実行し、`*Test` と `*IntegrationTest` の失敗があれば `backend/src/test/java/com/example/taskapp/` と `backend/src/main/java/com/example/taskapp/` の該当箇所を修正する
 - [ ] T039 `backend/src/main/java/com/example/taskapp/` 全体で `ZoneId.systemDefault()` の未使用、独自エラーコード未追加、DTO/Entity 分離、URL に動詞がないことを確認して必要なら修正する
@@ -155,23 +165,25 @@
 - **Phase 2 基盤**: Phase 1 完了に依存し、すべてのユーザーストーリーをブロックする。
 - **Phase 3 US1**: Phase 2 完了後に開始する。MVP 範囲。
 - **Phase 4 US2**: Phase 2 完了後に単体テストと統合テストで独立検証できる。インクリメンタル提供では US1 の後に実装する。
-- **Phase 5 US3**: Phase 2 完了後に単体テストと統合テストで独立検証できる。インクリメンタル提供では US2 の後に実装する。
+- **Phase 4 責務分離リファクタリング**: Phase 3/4 の API 振る舞い完了後に実行し、Phase 5 以降の実装をブロックする。
+- **Phase 5 US3**: Phase 2 と Phase 4 責務分離リファクタリング完了後に単体テストと統合テストで独立検証できる。インクリメンタル提供では US2 の後に実装する。
 - **Phase 6 US4**: Phase 2 完了後に単体テストと統合テストで独立検証できる。インクリメンタル提供では US3 の後に実装する。
 - **Phase 7 仕上げ**: 対象ユーザーストーリー完了後に実行する。
 
 ### ユーザーストーリー依存関係
 
 - **US1 (P1)**: 登録 API。MVP。ほかのストーリーへの依存なし。
-- **US2 (P2)**: 一覧・詳細 API。Service 単体テストと API/DB 統合テストで独立テスト可能。US1 と統合すると登録後確認の価値が完成する。
-- **US3 (P3)**: 更新 API。Service 単体テストと API/DB 統合テストで独立テスト可能。US1/US2 と統合すると登録、更新、確認の流れが完成する。
-- **US4 (P4)**: 論理削除 API。Service 単体テストと API/DB 統合テストで独立テスト可能。US2 と統合すると削除後の一覧・詳細除外が完成する。
+- **US2 (P2)**: 一覧・詳細 API。`TaskReadService` 単体テストと API/DB 統合テストで独立テスト可能。US1 と統合すると登録後確認の価値が完成する。
+- **US3 (P3)**: 更新 API。`TaskUpdateService` 単体テストと API/DB 統合テストで独立テスト可能。US1/US2 と統合すると登録、更新、確認の流れが完成する。
+- **US4 (P4)**: 論理削除 API。`TaskDeleteService` 単体テストと API/DB 統合テストで独立テスト可能。US2 と統合すると削除後の一覧・詳細除外が完成する。
 
 ### 各ユーザーストーリー内の順序
 
 - 単体テストと統合テストのタスクを先に作成し、ビジネスロジックと API/DB の期待値を固定する。
 - DTO と mapper を service/controller より前に作る。
 - Service の transaction boundary と business rule を Controller endpoint より前に実装する。
-- Controller は Service のみを呼び出し、Repository を直接呼ばない。
+- Service / Controller は登録・読み取り・更新・削除のユースケース単位で分け、`TaskService` / `TaskController` へ CRUD を集約しない。
+- Controller は担当ユースケースの Service のみを呼び出し、Repository を直接呼ばない。
 - 各ストーリー完了時に対象ストーリーの単体テストと統合テストを通す。
 
 ---
@@ -194,10 +206,21 @@ Task: "T023 backend/src/test/java/com/example/taskapp/task/service/TaskServiceTe
 Task: "T024 backend/src/test/java/com/example/taskapp/task/controller/TaskQueryIntegrationTest.java"
 ```
 
+### Phase 4 責務分離リファクタリング
+
+```bash
+Task: "T040 backend/src/test/java/com/example/taskapp/task/service/TaskCreateServiceTest.java"
+Task: "T040 backend/src/test/java/com/example/taskapp/task/service/TaskReadServiceTest.java"
+Task: "T041 backend/src/main/java/com/example/taskapp/task/service/TaskCreateService.java"
+Task: "T041 backend/src/main/java/com/example/taskapp/task/service/TaskReadService.java"
+Task: "T042 backend/src/main/java/com/example/taskapp/task/controller/TaskCreateController.java"
+Task: "T042 backend/src/main/java/com/example/taskapp/task/controller/TaskReadController.java"
+```
+
 ### ユーザーストーリー 3
 
 ```bash
-Task: "T027 backend/src/test/java/com/example/taskapp/task/service/TaskServiceTest.java"
+Task: "T027 backend/src/test/java/com/example/taskapp/task/service/TaskUpdateServiceTest.java"
 Task: "T028 backend/src/test/java/com/example/taskapp/task/controller/TaskUpdateIntegrationTest.java"
 Task: "T029 backend/src/main/java/com/example/taskapp/task/dto/TaskUpdateRequest.java"
 ```
@@ -205,7 +228,7 @@ Task: "T029 backend/src/main/java/com/example/taskapp/task/dto/TaskUpdateRequest
 ### ユーザーストーリー 4
 
 ```bash
-Task: "T032 backend/src/test/java/com/example/taskapp/task/service/TaskServiceTest.java"
+Task: "T032 backend/src/test/java/com/example/taskapp/task/service/TaskDeleteServiceTest.java"
 Task: "T033 backend/src/test/java/com/example/taskapp/task/controller/TaskDeleteIntegrationTest.java"
 ```
 
@@ -224,9 +247,10 @@ Task: "T033 backend/src/test/java/com/example/taskapp/task/controller/TaskDelete
 
 1. US1: 登録 API を追加し、MVP として検証する。
 2. US2: 一覧・詳細 API を追加し、登録済み task の確認を可能にする。
-3. US3: 更新 API を追加し、内容と進捗の変更を可能にする。
-4. US4: 論理削除 API を追加し、不要 task の除外を可能にする。
-5. Phase 7 で OpenAPI、quickstart、全体テスト、憲章制約を確認する。
+3. Phase 4 責務分離リファクタリングで、登録・読み取りを `TaskCreate*` / `TaskRead*` に分割する。
+4. US3: 更新 API を `TaskUpdate*` として追加し、内容と進捗の変更を可能にする。
+5. US4: 論理削除 API を `TaskDelete*` として追加し、不要 task の除外を可能にする。
+6. Phase 7 で OpenAPI、quickstart、全体テスト、憲章制約を確認する。
 
 ### Jira ブランチ運用メモ
 
@@ -239,6 +263,7 @@ Task: "T033 backend/src/test/java/com/example/taskapp/task/controller/TaskDelete
 ## Notes
 
 - [P] タスクは別ファイルで進められるが、同一ストーリー内の Service/Controller 更新は順序を守る。
+- `TaskService` / `TaskController` のような CRUD 集約クラスは作らない。既に作成済みの場合は、Phase 4 責務分離リファクタリングで削除し、`TaskCreate*`、`TaskRead*`、`TaskUpdate*`、`TaskDelete*` に分割する。
 - `status` 未指定時の `TODO` 補完や部分更新は `backend/AGENTS.md` に記載があるが、今回の `specs/` 配下の仕様では status 必須、PUT による全体更新を優先する。
 - `ErrorResponse.code` は HTTP ステータスコードの整数のみを使い、アプリケーション独自コードは追加しない。
 - API 応答の `createdAt` / `updatedAt` は JST (`+09:00`) の ISO-8601 文字列とし、サーバのデフォルトタイムゾーンには依存しない。

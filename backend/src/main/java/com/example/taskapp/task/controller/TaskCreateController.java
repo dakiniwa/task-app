@@ -15,26 +15,26 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.taskapp.task.dto.TaskCreateRequest;
 import com.example.taskapp.task.dto.TaskResponse;
-import com.example.taskapp.task.service.TaskService;
+import com.example.taskapp.task.service.TaskCreateService;
 
 /**
- * タスクAPIのリクエストを扱います。
+ * タスク登録APIのリクエストを扱います。
  */
 @RestController
 @RequestMapping("/users/{userId}/tasks")
 @Validated
-public class TaskController {
+public class TaskCreateController {
 
-	// タスクサービス
-	private final TaskService taskService;
+	// タスク登録サービス
+	private final TaskCreateService taskCreateService;
 
 	/**
 	 * コンストラクタ。
 	 *
-	 * @param taskService タスクサービス
+	 * @param taskCreateService タスク登録サービス
 	 */
-	public TaskController(TaskService taskService) {
-		this.taskService = taskService;
+	public TaskCreateController(TaskCreateService taskCreateService) {
+		this.taskCreateService = taskCreateService;
 	}
 
 	/**
@@ -48,7 +48,7 @@ public class TaskController {
 	public ResponseEntity<TaskResponse> createTask(
 			@PathVariable @NotBlank(message = "userId は必須です") String userId,
 			@Valid @RequestBody TaskCreateRequest request) {
-		TaskResponse response = taskService.createTask(userId, request);
+		TaskResponse response = taskCreateService.createTask(userId, request);
 		URI location = URI.create("/users/%s/tasks/%d".formatted(userId, response.id()));
 		return ResponseEntity.created(location).body(response);
 	}
