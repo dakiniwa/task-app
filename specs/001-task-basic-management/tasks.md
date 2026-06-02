@@ -134,13 +134,13 @@
 
 ### ユーザーストーリー 4 のテスト
 
-- [ ] T032 [US4] `backend/src/test/java/com/example/taskapp/task/service/TaskDeleteServiceTest.java` に `deleteTask` が `deleted=true` と `updatedAt` を更新する単体テストを追加する
-- [ ] T033 [P] [US4] `backend/src/test/java/com/example/taskapp/task/controller/TaskDeleteIntegrationTest.java` に DELETE 正常系、userId 空文字・空白のみ、削除後取得不可、404 の MockMvc 統合テストを追加する
+- [X] T032 [US4] `backend/src/test/java/com/example/taskapp/task/service/TaskDeleteServiceTest.java` に `deleteTask` が `deleted=true` と `updatedAt` を更新する単体テストを追加する
+- [X] T033 [P] [US4] `backend/src/test/java/com/example/taskapp/task/controller/TaskDeleteIntegrationTest.java` に DELETE 正常系、userId 空文字・空白のみ、削除後取得不可、404 の MockMvc 統合テストを追加する
 
 ### ユーザーストーリー 4 の実装
 
-- [ ] T034 [US4] `backend/src/main/java/com/example/taskapp/task/service/TaskDeleteService.java` に `deleteTask(String userId, Long taskId)` を実装し、物理削除ではなく `deleted=true` に更新する
-- [ ] T035 [US4] `backend/src/main/java/com/example/taskapp/task/controller/TaskDeleteController.java` に `@NotBlank` 相当の `userId` path validation を含む `DELETE /users/{userId}/tasks/{taskId}` を追加し、成功時に 204 No Content を返す
+- [X] T034 [US4] `backend/src/main/java/com/example/taskapp/task/service/TaskDeleteService.java` に `deleteTask(String userId, Long taskId)` を実装し、物理削除ではなく `deleted=true` に更新する
+- [X] T035 [US4] `backend/src/main/java/com/example/taskapp/task/controller/TaskDeleteController.java` に `@NotBlank` 相当の `userId` path validation を含む `DELETE /users/{userId}/tasks/{taskId}` を追加し、成功時に 204 No Content を返す
 
 **チェックポイント**: ユーザーストーリー 4 が単体テストと統合テストで検証でき、登録から論理削除までの主要操作が一通り成立する。
 
@@ -157,6 +157,27 @@
 
 ---
 
+## Phase 8: 例外ハンドラー保守性改善 (横断関心事)
+
+**目的**: Spring Boot 4 / Spring Framework 7 の検証例外を入力元ごとに正しく展開し、リクエストボディ、パス変数、将来のクエリパラメータ追加時にも共通エラーレスポンスを保守しやすくする。
+
+**独立テスト**: `@Valid @RequestBody`、`@PathVariable`、型変換失敗の各入力不正で HTTP 400 と `ErrorResponse` が返り、body DTO の field は `request` ではなく `title` / `status` として返ることを確認する。
+
+- [ ] T044 [P] `backend/src/test/java/com/example/taskapp/common/exception/GlobalExceptionHandlerTest.java` に `MethodArgumentNotValidException` と `HandlerMethodValidationException` の両方が `ErrorResponse` の `details.field` を正しく返す単体テストを追加する
+- [ ] T045 [P] `backend/src/test/java/com/example/taskapp/task/controller/TaskCreateIntegrationTest.java` の必須項目不足テストを `@Validated` に依存しない期待値として維持し、不足する場合は `title` / `status` の 400 details 検証を追加する
+- [ ] T046 [P] `backend/src/test/java/com/example/taskapp/task/controller/TaskUpdateIntegrationTest.java` の必須項目不足テストを `@Validated` に依存しない期待値として維持し、不足する場合は `title` / `status` の 400 details 検証を追加する
+- [ ] T047 [P] `backend/src/test/java/com/example/taskapp/task/controller/TaskReadIntegrationTest.java` と `backend/src/test/java/com/example/taskapp/task/controller/TaskDeleteIntegrationTest.java` の `userId` 空白テストを維持し、`taskId` 型変換失敗が共通 400 details を返す統合テストを追加する
+- [ ] T048 `backend/src/main/java/com/example/taskapp/common/exception/GlobalExceptionHandler.java` で `MethodArgumentNotValidException` と `HandlerMethodValidationException` の `@ExceptionHandler` は分けたまま、`ErrorDetail` 変換と `badRequest` 生成を共通 private method に整理する
+- [ ] T049 `backend/src/main/java/com/example/taskapp/common/exception/GlobalExceptionHandler.java` で `HandlerMethodValidationException` の `ParameterErrors` から `FieldError` を取り出し、DTO 内 field を `request` ではなく `title` / `status` として返す処理を実装する
+- [ ] T050 `backend/src/main/java/com/example/taskapp/common/exception/GlobalExceptionHandler.java` に `MethodArgumentTypeMismatchException` と `MissingServletRequestParameterException` を 400 の `ErrorResponse` に変換する handler を追加する
+- [ ] T051 `backend/src/main/java/com/example/taskapp/task/controller/TaskCreateController.java`、`backend/src/main/java/com/example/taskapp/task/controller/TaskReadController.java`、`backend/src/main/java/com/example/taskapp/task/controller/TaskUpdateController.java`、`backend/src/main/java/com/example/taskapp/task/controller/TaskDeleteController.java` からクラスレベルの `@Validated` と未使用 import を削除し、Controller 側は `@Valid` と各 path/query 制約だけを残す
+- [ ] T052 `backend/pom.xml` を基点に `cd backend && ./mvnw test` を実行し、例外ハンドラー改善後も `GlobalExceptionHandlerTest`、`TaskCreateIntegrationTest`、`TaskReadIntegrationTest`、`TaskUpdateIntegrationTest`、`TaskDeleteIntegrationTest` が通ることを確認する
+- [ ] T053 `specs/001-task-basic-management/quickstart.md` に入力不正確認として body 必須項目不足、`userId` 空白、`taskId` 型変換失敗の代表 curl と期待する共通 400 レスポンスを追記する
+
+**チェックポイント**: Spring の内部例外型が `MethodArgumentNotValidException` でも `HandlerMethodValidationException` でも、API 利用者へ返る `ErrorResponse` の構造と field 名が安定している。
+
+---
+
 ## 依存関係と実行順序
 
 ### フェーズ依存関係
@@ -169,6 +190,7 @@
 - **Phase 5 US3**: Phase 2 と Phase 4 責務分離リファクタリング完了後に単体テストと統合テストで独立検証できる。インクリメンタル提供では US2 の後に実装する。
 - **Phase 6 US4**: Phase 2 完了後に単体テストと統合テストで独立検証できる。インクリメンタル提供では US3 の後に実装する。
 - **Phase 7 仕上げ**: 対象ユーザーストーリー完了後に実行する。
+- **Phase 8 例外ハンドラー保守性改善**: Phase 2 の共通例外基盤と対象 Controller 実装完了後に実行する。US1 から US4 の API レスポンス形式を横断して保護する。
 
 ### ユーザーストーリー依存関係
 
@@ -232,6 +254,16 @@ Task: "T032 backend/src/test/java/com/example/taskapp/task/service/TaskDeleteSer
 Task: "T033 backend/src/test/java/com/example/taskapp/task/controller/TaskDeleteIntegrationTest.java"
 ```
 
+### Phase 8 例外ハンドラー保守性改善
+
+```bash
+Task: "T044 backend/src/test/java/com/example/taskapp/common/exception/GlobalExceptionHandlerTest.java"
+Task: "T045 backend/src/test/java/com/example/taskapp/task/controller/TaskCreateIntegrationTest.java"
+Task: "T046 backend/src/test/java/com/example/taskapp/task/controller/TaskUpdateIntegrationTest.java"
+Task: "T047 backend/src/test/java/com/example/taskapp/task/controller/TaskReadIntegrationTest.java"
+Task: "T047 backend/src/test/java/com/example/taskapp/task/controller/TaskDeleteIntegrationTest.java"
+```
+
 ---
 
 ## 実装戦略
@@ -250,7 +282,8 @@ Task: "T033 backend/src/test/java/com/example/taskapp/task/controller/TaskDelete
 3. Phase 4 責務分離リファクタリングで、登録・読み取りを `TaskCreate*` / `TaskRead*` に分割する。
 4. US3: 更新 API を `TaskUpdate*` として追加し、内容と進捗の変更を可能にする。
 5. US4: 論理削除 API を `TaskDelete*` として追加し、不要 task の除外を可能にする。
-6. Phase 7 で OpenAPI、quickstart、全体テスト、憲章制約を確認する。
+6. Phase 8 で共通例外ハンドラーを Spring 7 の検証例外に強い形へ整理し、入力元ごとの 400 details を回帰テストで固定する。
+7. Phase 7 で OpenAPI、quickstart、全体テスト、憲章制約を確認する。
 
 ### Jira ブランチ運用メモ
 
