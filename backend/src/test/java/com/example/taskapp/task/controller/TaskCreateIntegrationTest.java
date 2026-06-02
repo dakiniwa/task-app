@@ -6,6 +6,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.InputStream;
+import java.sql.Connection;
+
+import javax.sql.DataSource;
+
+import org.dbunit.database.DatabaseConfig;
+import org.dbunit.database.DatabaseConnection;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
+import org.dbunit.ext.h2.H2DataTypeFactory;
+import org.dbunit.operation.DatabaseOperation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,12 +24,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
-
-import com.example.taskapp.task.repository.TaskRepository;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -30,12 +40,17 @@ class TaskCreateIntegrationTest {
 	private MockMvc mockMvc;
 
 	@Autowired
-	private TaskRepository taskRepository;
+	private DataSource dataSource;
 
 	@BeforeEach
-	void setUp() {
-		// Arrange
-		taskRepository.deleteAll();
+	void setUpDatabase() throws Exception {
+		try (Connection connection = dataSource.getConnection();
+				InputStream dataset = new ClassPathResource("/dbunit/empty-tasks.xml").getInputStream()) {
+			DatabaseConnection dbUnitConnection = new DatabaseConnection(connection);
+			dbUnitConnection.getConfig().setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new H2DataTypeFactory());
+			IDataSet dataSet = new FlatXmlDataSetBuilder().setColumnSensing(true).build(dataset);
+			DatabaseOperation.CLEAN_INSERT.execute(dbUnitConnection, dataSet);
+		}
 	}
 
 	@Nested

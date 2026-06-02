@@ -113,14 +113,14 @@
 
 ### ユーザーストーリー 3 のテスト
 
-- [ ] T027 [US3] `backend/src/test/java/com/example/taskapp/task/service/TaskUpdateServiceTest.java` に固定 `Clock` で `updateTask` が内容と `updatedAt` を更新する単体テストを追加する
-- [ ] T028 [P] [US3] `backend/src/test/java/com/example/taskapp/task/controller/TaskUpdateIntegrationTest.java` に PUT 正常系、userId 空文字・空白のみ、必須項目不足、不正 status、404 の MockMvc 統合テストを追加する
+- [X] T027 [US3] `backend/src/test/java/com/example/taskapp/task/service/TaskUpdateServiceTest.java` に固定 `Clock` で `updateTask` が内容と `updatedAt` を更新する単体テストを追加する
+- [X] T028 [P] [US3] `backend/src/test/java/com/example/taskapp/task/controller/TaskUpdateIntegrationTest.java` に PUT 正常系、userId 空文字・空白のみ、必須項目不足、不正 status、404 の MockMvc 統合テストを追加する
 
 ### ユーザーストーリー 3 の実装
 
-- [ ] T029 [P] [US3] `backend/src/main/java/com/example/taskapp/task/dto/TaskUpdateRequest.java` に `title` の `@NotBlank` 相当 validation、`status` の validation、任意 `description` を持つ更新 request DTO を作成する
-- [ ] T030 [US3] `backend/src/main/java/com/example/taskapp/task/service/TaskUpdateService.java` に `updateTask(String userId, Long taskId, TaskUpdateRequest request)` を実装する
-- [ ] T031 [US3] `backend/src/main/java/com/example/taskapp/task/controller/TaskUpdateController.java` に `@NotBlank` 相当の `userId` path validation を含む `PUT /users/{userId}/tasks/{taskId}` を追加する
+- [X] T029 [P] [US3] `backend/src/main/java/com/example/taskapp/task/dto/TaskUpdateRequest.java` に `title` の `@NotBlank` 相当 validation、`status` の validation、任意 `description` を持つ更新 request DTO を作成する
+- [X] T030 [US3] `backend/src/main/java/com/example/taskapp/task/service/TaskUpdateService.java` に `updateTask(String userId, Long taskId, TaskUpdateRequest request)` を実装する
+- [X] T031 [US3] `backend/src/main/java/com/example/taskapp/task/controller/TaskUpdateController.java` に `@NotBlank` 相当の `userId` path validation を含む `PUT /users/{userId}/tasks/{taskId}` を追加する
 
 **チェックポイント**: ユーザーストーリー 3 が単体テストと統合テストで検証でき、US1/US2 と組み合わせて登録、更新、確認の流れを検証できる。
 
