@@ -2,6 +2,7 @@ package com.example.taskapp.task.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -46,7 +47,7 @@ public class TaskUpdateController {
 	@PutMapping("/{taskId}")
 	public ResponseEntity<TaskResponse> updateTask(
 			@PathVariable @NotBlank(message = "userId は必須です") String userId,
-			@PathVariable Long taskId,
+			@PathVariable @Positive(message = "taskId は1以上を指定してください") Long taskId,
 			@Valid @RequestBody TaskUpdateRequest request) {
 		return ResponseEntity.ok(taskUpdateService.updateTask(userId, taskId, request));
 	}

@@ -1,6 +1,7 @@
 package com.example.taskapp.task.controller;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -41,7 +42,7 @@ public class TaskDeleteController {
 	@DeleteMapping("/{taskId}")
 	public ResponseEntity<Void> deleteTask(
 			@PathVariable @NotBlank(message = "userId は必須です") String userId,
-			@PathVariable Long taskId) {
+			@PathVariable @Positive(message = "taskId は1以上を指定してください") Long taskId) {
 		taskDeleteService.deleteTask(userId, taskId);
 		return ResponseEntity.noContent().build();
 	}
