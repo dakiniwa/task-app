@@ -5,7 +5,7 @@
 - 親ブランチは `feature/SCRUM-6`。
 - サブタスク実装は `/speckit-tasks` 後、各実装開始直前に `feature/sub/SCRUM-16` から `feature/sub/SCRUM-23` の単位で切る。
 - Backend は Java 25 / Spring Boot 4.0.6。
-- DB は PostgreSQL 17。
+- DB は PostgreSQL 18。
 - 認証は導入せず、`userId` は API path で渡す。
 - 作成時点・更新時点の API 表現は JST (`Asia/Tokyo`, UTC+09:00) の ISO-8601 オフセット付き文字列とし、サーバのデフォルトタイムゾーンには依存させない。
 
@@ -54,6 +54,12 @@ curl -i -X POST "http://localhost:8080/users/user-1/tasks" \
 - `status` は `TODO`。
 - `createdAt` と `updatedAt` は `2026-05-09T10:30:00+09:00` のように JST の `+09:00` オフセットを含む。
 
+以降の `{taskId}` は、登録レスポンスに含まれる `id` を使う。例:
+
+```bash
+export TASK_ID=1
+```
+
 ## 5. タスク一覧を取得する
 
 ```bash
@@ -69,7 +75,7 @@ curl -i "http://localhost:8080/users/user-1/tasks"
 ## 6. タスク詳細を取得する
 
 ```bash
-curl -i "http://localhost:8080/users/user-1/tasks/1"
+curl -i "http://localhost:8080/users/user-1/tasks/${TASK_ID}"
 ```
 
 期待結果:
@@ -80,7 +86,7 @@ curl -i "http://localhost:8080/users/user-1/tasks/1"
 ## 7. タスクを更新する
 
 ```bash
-curl -i -X PUT "http://localhost:8080/users/user-1/tasks/1" \
+curl -i -X PUT "http://localhost:8080/users/user-1/tasks/${TASK_ID}" \
   -H "Content-Type: application/json" \
   -d '{"title":"買い物メモを更新する","description":"予算も追記する","status":"DOING"}'
 ```
@@ -100,10 +106,21 @@ curl -i -X PUT "http://localhost:8080/users/user-1/tasks/1" \
 - サーバのデフォルトタイムゾーンが JST 以外でも、API 応答の `createdAt` / `updatedAt` は `+09:00` オフセットを含む。
 - 実装では `ZoneId.systemDefault()` に依存しない。
 
-## 9. タスクを論理削除する
+## 9. 別 userId の taskId を取得できないことを確認する
 
 ```bash
-curl -i -X DELETE "http://localhost:8080/users/user-1/tasks/1"
+curl -i "http://localhost:8080/users/other-user/tasks/${TASK_ID}"
+```
+
+期待結果:
+
+- HTTP `404 Not Found`
+- 存在しない Task と同じ共通エラーフォーマットで返る。
+
+## 10. タスクを論理削除する
+
+```bash
+curl -i -X DELETE "http://localhost:8080/users/user-1/tasks/${TASK_ID}"
 ```
 
 期待結果:
@@ -111,10 +128,10 @@ curl -i -X DELETE "http://localhost:8080/users/user-1/tasks/1"
 - HTTP `204 No Content`
 - 以後の一覧・詳細取得対象から除外される。
 
-## 10. 削除後の取得不可を確認する
+## 11. 削除後の取得不可を確認する
 
 ```bash
-curl -i "http://localhost:8080/users/user-1/tasks/1"
+curl -i "http://localhost:8080/users/user-1/tasks/${TASK_ID}"
 ```
 
 期待結果:
@@ -122,7 +139,7 @@ curl -i "http://localhost:8080/users/user-1/tasks/1"
 - HTTP `404 Not Found`
 - レスポンスは `code` と `message` を含む共通エラーフォーマット。
 
-## 11. 入力不正を確認する
+## 12. 入力不正を確認する
 
 ```bash
 curl -i -X POST "http://localhost:8080/users/user-1/tasks" \
@@ -136,14 +153,3 @@ curl -i -X POST "http://localhost:8080/users/user-1/tasks" \
 - `code` は `400`。
 - `message` が含まれる。
 - 必要に応じて `details` に入力項目の補足が含まれる。
-
-## 12. 別 userId の taskId を取得できないことを確認する
-
-```bash
-curl -i "http://localhost:8080/users/other-user/tasks/1"
-```
-
-期待結果:
-
-- HTTP `404 Not Found`
-- 存在しない Task と同じ共通エラーフォーマットで返る。

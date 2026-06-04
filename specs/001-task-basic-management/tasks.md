@@ -150,10 +150,10 @@
 
 **目的**: API 契約、quickstart、全体テスト、憲章制約を横断的に確認する。
 
-- [ ] T036 [P] `backend/src/main/java/com/example/taskapp/task/controller/` 配下の各 Controller の HTTP method、path、status code、schema が `specs/001-task-basic-management/contracts/openapi.yaml` に一致することを確認して Controller を修正する。契約変更が必要な場合は `specs/001-task-basic-management/spec.md` と `specs/001-task-basic-management/plan.md` へ戻って更新する
-- [ ] T037 [P] `specs/001-task-basic-management/quickstart.md` の curl シナリオを実装後 API に合わせて検証し、差分があれば同ファイルを更新する
-- [ ] T038 `backend/pom.xml` を基点に `cd backend && ./mvnw test` を実行し、`*Test` と `*IntegrationTest` の失敗があれば `backend/src/test/java/com/example/taskapp/` と `backend/src/main/java/com/example/taskapp/` の該当箇所を修正する
-- [ ] T039 `backend/src/main/java/com/example/taskapp/` 全体で `ZoneId.systemDefault()` の未使用、独自エラーコード未追加、DTO/Entity 分離、URL に動詞がないことを確認して必要なら修正する
+- [X] T036 [P] `backend/src/main/java/com/example/taskapp/task/controller/` 配下の各 Controller の HTTP method、path、status code、schema が `specs/001-task-basic-management/contracts/openapi.yaml` に一致することを確認して Controller を修正する。契約変更が必要な場合は `specs/001-task-basic-management/spec.md` と `specs/001-task-basic-management/plan.md` へ戻って更新する
+- [X] T037 [P] `specs/001-task-basic-management/quickstart.md` の curl シナリオを実装後 API に合わせて検証し、差分があれば同ファイルを更新する
+- [X] T038 `backend/pom.xml` を基点に `cd backend && ./mvnw test` を実行し、`*Test` と `*IntegrationTest` の失敗があれば `backend/src/test/java/com/example/taskapp/` と `backend/src/main/java/com/example/taskapp/` の該当箇所を修正する
+- [X] T039 `backend/src/main/java/com/example/taskapp/` 全体で `ZoneId.systemDefault()` の未使用、独自エラーコード未追加、DTO/Entity 分離、URL に動詞がないことを確認して必要なら修正する
 
 ---
 

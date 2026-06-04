@@ -95,6 +95,16 @@ class TaskDeleteIntegrationTest {
 				.andExpect(jsonPath("$.details[0].field", endsWith("userId")))
 				.andExpect(jsonPath("$.details[0].message").value("userId は必須です"));
 		}
+
+		@Test
+		@DisplayName("taskId が1未満の場合は共通エラーレスポンスを返す")
+		void deleteTaskRejectsNonPositiveTaskId() throws Exception {
+			mockMvc.perform(delete("/users/user-1/tasks/0"))
+				.andExpect(status().isBadRequest())
+				.andExpect(badRequestErrorResponse(BAD_REQUEST_MESSAGE))
+				.andExpect(jsonPath("$.details[0].field", endsWith("taskId")))
+				.andExpect(jsonPath("$.details[0].message").value("taskId は1以上を指定してください"));
+		}
 	}
 
 	@Nested

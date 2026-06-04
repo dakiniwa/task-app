@@ -135,6 +135,20 @@ class TaskUpdateIntegrationTest {
 				.andExpect(badRequestErrorResponse(BAD_REQUEST_MESSAGE))
 				.andExpect(jsonPath("$.details[0].message").value("リクエストボディの形式が不正です"));
 		}
+
+		@Test
+		@DisplayName("taskId が1未満の場合は共通エラーレスポンスを返す")
+		void updateTaskRejectsNonPositiveTaskId() throws Exception {
+			mockMvc.perform(put("/users/user-1/tasks/0")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content("""
+						{"title":"updated","status":"DOING"}
+						"""))
+				.andExpect(status().isBadRequest())
+				.andExpect(badRequestErrorResponse(BAD_REQUEST_MESSAGE))
+				.andExpect(jsonPath("$.details[0].field", endsWith("taskId")))
+				.andExpect(jsonPath("$.details[0].message").value("taskId は1以上を指定してください"));
+		}
 	}
 
 	@Nested
