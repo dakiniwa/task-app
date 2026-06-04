@@ -131,6 +131,17 @@ class TaskReadIntegrationTest {
 				.andExpect(jsonPath("$.details[0].field", endsWith("taskId")))
 				.andExpect(jsonPath("$.details[0].message").value("taskId は1以上を指定してください"));
 		}
+
+		@Test
+		@DisplayName("詳細取得で taskId の型変換に失敗した場合は共通エラーレスポンスを返す")
+		void getTaskRejectsInvalidTaskIdType() throws Exception {
+			// Act & Assert
+			mockMvc.perform(get("/users/user-1/tasks/not-a-number"))
+				.andExpect(status().isBadRequest())
+				.andExpect(badRequestErrorResponse(BAD_REQUEST_MESSAGE))
+				.andExpect(jsonPath("$.details[0].field").value("taskId"))
+				.andExpect(jsonPath("$.details[0].message").value("taskId の形式が不正です"));
+		}
 	}
 
 	@Nested
