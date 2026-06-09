@@ -37,15 +37,13 @@ public class GlobalExceptionHandler {
 	 * @return 400 の共通エラーレスポンス
 	 */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException exception) {
-		List<ErrorDetail> details = exception.getBindingResult()
-			.getFieldErrors()
-			.stream()
-			.map(this::toErrorDetail)
-			.toList();
+	public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(
+			MethodArgumentNotValidException exception) {
+		List<ErrorDetail> details =
+				exception.getBindingResult().getFieldErrors().stream().map(this::toErrorDetail).toList();
 
-		log.warn("バリデーションエラーが発生しました: type={}, status={}, details={}", exception.getClass().getSimpleName(),
-				HttpStatus.BAD_REQUEST.value(), details);
+		log.warn("バリデーションエラーが発生しました: type={}, status={}, details={}",
+				exception.getClass().getSimpleName(), HttpStatus.BAD_REQUEST.value(), details);
 		return badRequest(details);
 	}
 
@@ -56,14 +54,13 @@ public class GlobalExceptionHandler {
 	 * @return 400 の共通エラーレスポンス
 	 */
 	@ExceptionHandler(HandlerMethodValidationException.class)
-	public ResponseEntity<ErrorResponse> handleHandlerMethodValidation(HandlerMethodValidationException exception) {
-		List<ErrorDetail> details = exception.getParameterValidationResults()
-			.stream()
-			.flatMap(this::toErrorDetails)
-			.toList();
+	public ResponseEntity<ErrorResponse> handleHandlerMethodValidation(
+			HandlerMethodValidationException exception) {
+		List<ErrorDetail> details =
+				exception.getParameterValidationResults().stream().flatMap(this::toErrorDetails).toList();
 
-		log.warn("バリデーションエラーが発生しました: type={}, status={}, details={}", exception.getClass().getSimpleName(),
-				HttpStatus.BAD_REQUEST.value(), details);
+		log.warn("バリデーションエラーが発生しました: type={}, status={}, details={}",
+				exception.getClass().getSimpleName(), HttpStatus.BAD_REQUEST.value(), details);
 		return badRequest(details);
 	}
 
@@ -74,14 +71,15 @@ public class GlobalExceptionHandler {
 	 * @return 400 の共通エラーレスポンス
 	 */
 	@ExceptionHandler(ConstraintViolationException.class)
-	public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException exception) {
-		List<ErrorDetail> details = exception.getConstraintViolations()
-			.stream()
-			.map(violation -> new ErrorDetail(violation.getPropertyPath().toString(), violation.getMessage()))
-			.toList();
+	public ResponseEntity<ErrorResponse> handleConstraintViolation(
+			ConstraintViolationException exception) {
+		List<ErrorDetail> details = exception.getConstraintViolations().stream()
+				.map(violation -> new ErrorDetail(violation.getPropertyPath().toString(),
+						violation.getMessage()))
+				.toList();
 
-		log.warn("バリデーションエラーが発生しました: type={}, status={}, details={}", exception.getClass().getSimpleName(),
-				HttpStatus.BAD_REQUEST.value(), details);
+		log.warn("バリデーションエラーが発生しました: type={}, status={}, details={}",
+				exception.getClass().getSimpleName(), HttpStatus.BAD_REQUEST.value(), details);
 		return badRequest(details);
 	}
 
@@ -92,10 +90,11 @@ public class GlobalExceptionHandler {
 	 * @return 400 の共通エラーレスポンス
 	 */
 	@ExceptionHandler(HttpMessageNotReadableException.class)
-	public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException exception) {
+	public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(
+			HttpMessageNotReadableException exception) {
 		List<ErrorDetail> details = List.of(new ErrorDetail(null, "リクエストボディの形式が不正です"));
-		log.warn("バリデーションエラーが発生しました: type={}, status={}, details={}", exception.getClass().getSimpleName(),
-				HttpStatus.BAD_REQUEST.value(), details);
+		log.warn("バリデーションエラーが発生しました: type={}, status={}, details={}",
+				exception.getClass().getSimpleName(), HttpStatus.BAD_REQUEST.value(), details);
 		return badRequest(details);
 	}
 
@@ -108,10 +107,10 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
 	public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(
 			MethodArgumentTypeMismatchException exception) {
-		List<ErrorDetail> details = List
-			.of(new ErrorDetail(exception.getName(), exception.getName() + " の形式が不正です"));
-		log.warn("バリデーションエラーが発生しました: type={}, status={}, details={}", exception.getClass().getSimpleName(),
-				HttpStatus.BAD_REQUEST.value(), details);
+		List<ErrorDetail> details =
+				List.of(new ErrorDetail(exception.getName(), exception.getName() + " の形式が不正です"));
+		log.warn("バリデーションエラーが発生しました: type={}, status={}, details={}",
+				exception.getClass().getSimpleName(), HttpStatus.BAD_REQUEST.value(), details);
 		return badRequest(details);
 	}
 
@@ -125,9 +124,9 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleMissingServletRequestParameter(
 			MissingServletRequestParameterException exception) {
 		List<ErrorDetail> details = List
-			.of(new ErrorDetail(exception.getParameterName(), exception.getParameterName() + " は必須です"));
-		log.warn("バリデーションエラーが発生しました: type={}, status={}, details={}", exception.getClass().getSimpleName(),
-				HttpStatus.BAD_REQUEST.value(), details);
+				.of(new ErrorDetail(exception.getParameterName(), exception.getParameterName() + " は必須です"));
+		log.warn("バリデーションエラーが発生しました: type={}, status={}, details={}",
+				exception.getClass().getSimpleName(), HttpStatus.BAD_REQUEST.value(), details);
 		return badRequest(details);
 	}
 
@@ -139,7 +138,8 @@ public class GlobalExceptionHandler {
 	 */
 	@ExceptionHandler(TaskNotFoundException.class)
 	public ResponseEntity<ErrorResponse> handleTaskNotFound(TaskNotFoundException exception) {
-		ErrorResponse response = new ErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage());
+		ErrorResponse response =
+				new ErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage());
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 	}
 
@@ -152,7 +152,8 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorResponse> handleException(Exception exception) {
 		log.error("想定外のエラーが発生しました: {}", exception.getMessage(), exception);
-		ErrorResponse response = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "サーバー内部エラーが発生しました");
+		ErrorResponse response =
+				new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "サーバー内部エラーが発生しました");
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 	}
 

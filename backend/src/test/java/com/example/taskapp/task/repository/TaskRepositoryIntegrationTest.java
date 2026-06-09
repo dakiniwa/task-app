@@ -42,7 +42,8 @@ class TaskRepositoryIntegrationTest {
 		try (Connection connection = dataSource.getConnection();
 				InputStream dataset = new ClassPathResource("/dbunit/tasks.xml").getInputStream()) {
 			DatabaseConnection dbUnitConnection = new DatabaseConnection(connection);
-			dbUnitConnection.getConfig().setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new H2DataTypeFactory());
+			dbUnitConnection.getConfig().setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY,
+					new H2DataTypeFactory());
 			IDataSet dataSet = new FlatXmlDataSetBuilder().setColumnSensing(true).build(dataset);
 			DatabaseOperation.CLEAN_INSERT.execute(dbUnitConnection, dataSet);
 		}

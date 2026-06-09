@@ -41,10 +41,8 @@ public class TaskReadService {
 	 */
 	@Transactional(readOnly = true)
 	public List<TaskResponse> listTasks(String userId) {
-		return taskRepository.findAllByUserIdAndDeletedFalseOrderByCreatedAtDesc(userId)
-			.stream()
-			.map(taskResponseMapper::toResponse)
-			.toList();
+		return taskRepository.findAllByUserIdAndDeletedFalseOrderByCreatedAtDesc(userId).stream()
+				.map(taskResponseMapper::toResponse).toList();
 	}
 
 	/**
@@ -58,7 +56,6 @@ public class TaskReadService {
 	@Transactional(readOnly = true)
 	public TaskResponse getTask(String userId, Long taskId) {
 		return taskRepository.findByIdAndUserIdAndDeletedFalse(taskId, userId)
-			.map(taskResponseMapper::toResponse)
-			.orElseThrow(TaskNotFoundException::new);
+				.map(taskResponseMapper::toResponse).orElseThrow(TaskNotFoundException::new);
 	}
 }

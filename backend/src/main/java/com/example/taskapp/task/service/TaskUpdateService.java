@@ -35,7 +35,8 @@ public class TaskUpdateService {
 	 * @param taskResponseMapper タスクレスポンスマッパー
 	 * @param clock クロック
 	 */
-	public TaskUpdateService(TaskRepository taskRepository, TaskResponseMapper taskResponseMapper, Clock clock) {
+	public TaskUpdateService(TaskRepository taskRepository, TaskResponseMapper taskResponseMapper,
+			Clock clock) {
 		this.taskRepository = taskRepository;
 		this.taskResponseMapper = taskResponseMapper;
 		this.clock = clock;
@@ -53,7 +54,7 @@ public class TaskUpdateService {
 	@Transactional
 	public TaskResponse updateTask(String userId, Long taskId, TaskUpdateRequest request) {
 		Task task = taskRepository.findByIdAndUserIdAndDeletedFalse(taskId, userId)
-			.orElseThrow(TaskNotFoundException::new);
+				.orElseThrow(TaskNotFoundException::new);
 		task.update(request.title(), request.description(), request.status(), Instant.now(clock));
 		return taskResponseMapper.toResponse(task);
 	}

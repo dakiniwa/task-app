@@ -37,7 +37,8 @@ class TaskReadServiceTest {
 	private TaskRepository taskRepository;
 
 	@Spy
-	private TaskResponseMapper taskResponseMapper = new TaskResponseMapper(new JstDateTimeFormatter(JST));
+	private TaskResponseMapper taskResponseMapper =
+			new TaskResponseMapper(new JstDateTimeFormatter(JST));
 
 	@InjectMocks
 	private TaskReadService taskReadService;
@@ -46,10 +47,12 @@ class TaskReadServiceTest {
 	@DisplayName("指定ユーザーの未削除タスク一覧を作成日時降順のレスポンスとして返す")
 	void listTasksReturnsVisibleUserTasksInRepositoryOrder() {
 		// Arrange
-		Task olderTask = taskWithId(1L, "user-1", "older", null, TaskStatus.TODO, "2026-05-09T00:00:00Z");
-		Task newerTask = taskWithId(2L, "user-1", "newer", "description", TaskStatus.DOING, "2026-05-09T01:00:00Z");
+		Task olderTask =
+				taskWithId(1L, "user-1", "older", null, TaskStatus.TODO, "2026-05-09T00:00:00Z");
+		Task newerTask =
+				taskWithId(2L, "user-1", "newer", "description", TaskStatus.DOING, "2026-05-09T01:00:00Z");
 		when(taskRepository.findAllByUserIdAndDeletedFalseOrderByCreatedAtDesc("user-1"))
-			.thenReturn(List.of(newerTask, olderTask));
+				.thenReturn(List.of(newerTask, olderTask));
 
 		// Act
 		List<TaskResponse> responses = taskReadService.listTasks("user-1");
@@ -70,7 +73,8 @@ class TaskReadServiceTest {
 	void getTaskReturnsVisibleUserTask() {
 		// Arrange
 		Task task = taskWithId(1L, "user-1", "買い物メモ", "週末まで", TaskStatus.TODO, "2026-05-09T00:00:00Z");
-		when(taskRepository.findByIdAndUserIdAndDeletedFalse(1L, "user-1")).thenReturn(Optional.of(task));
+		when(taskRepository.findByIdAndUserIdAndDeletedFalse(1L, "user-1"))
+				.thenReturn(Optional.of(task));
 
 		// Act
 		TaskResponse response = taskReadService.getTask("user-1", 1L);
@@ -90,12 +94,12 @@ class TaskReadServiceTest {
 	@DisplayName("存在しないタスクは 404 用例外を投げる")
 	void getTaskThrowsTaskNotFoundExceptionWhenTaskIsMissing() {
 		// Arrange
-		when(taskRepository.findByIdAndUserIdAndDeletedFalse(999L, "user-1")).thenReturn(Optional.empty());
+		when(taskRepository.findByIdAndUserIdAndDeletedFalse(999L, "user-1"))
+				.thenReturn(Optional.empty());
 
 		// Act & Assert
 		assertThatThrownBy(() -> taskReadService.getTask("user-1", 999L))
-			.isInstanceOf(TaskNotFoundException.class)
-			.hasMessage("タスクが見つかりません");
+				.isInstanceOf(TaskNotFoundException.class).hasMessage("タスクが見つかりません");
 		verify(taskRepository).findByIdAndUserIdAndDeletedFalse(999L, "user-1");
 	}
 
@@ -110,13 +114,8 @@ class TaskReadServiceTest {
 	 * @param instantText 作成・更新日時
 	 * @return ID 設定済みタスク
 	 */
-	private Task taskWithId(
-			Long id,
-			String userId,
-			String title,
-			String description,
-			TaskStatus status,
-			String instantText) {
+	private Task taskWithId(Long id, String userId, String title, String description,
+			TaskStatus status, String instantText) {
 		Instant instant = Instant.parse(instantText);
 		Task task = new Task(userId, title, description, status, instant, instant);
 		ReflectionTestUtils.setField(task, "id", id);

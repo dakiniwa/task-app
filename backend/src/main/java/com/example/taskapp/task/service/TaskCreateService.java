@@ -34,7 +34,8 @@ public class TaskCreateService {
 	 * @param taskResponseMapper タスクレスポンスマッパー
 	 * @param clock クロック
 	 */
-	public TaskCreateService(TaskRepository taskRepository, TaskResponseMapper taskResponseMapper, Clock clock) {
+	public TaskCreateService(TaskRepository taskRepository, TaskResponseMapper taskResponseMapper,
+			Clock clock) {
 		this.taskRepository = taskRepository;
 		this.taskResponseMapper = taskResponseMapper;
 		this.clock = clock;
@@ -50,7 +51,8 @@ public class TaskCreateService {
 	@Transactional
 	public TaskResponse createTask(String userId, TaskCreateRequest request) {
 		Instant now = Instant.now(clock);
-		Task task = new Task(userId, request.title(), request.description(), request.status(), now, now);
+		Task task =
+				new Task(userId, request.title(), request.description(), request.status(), now, now);
 		Task savedTask = taskRepository.save(task);
 		return taskResponseMapper.toResponse(savedTask);
 	}

@@ -43,7 +43,8 @@ class TaskDeleteServiceTest {
 	@DisplayName("指定ユーザーの未削除タスクを論理削除して更新日時を更新する")
 	void deleteTaskMarksVisibleUserTaskDeletedWithFixedClock() {
 		Task task = taskWithId(1L, "user-1");
-		when(taskRepository.findByIdAndUserIdAndDeletedFalse(1L, "user-1")).thenReturn(Optional.of(task));
+		when(taskRepository.findByIdAndUserIdAndDeletedFalse(1L, "user-1"))
+				.thenReturn(Optional.of(task));
 		when(clock.instant()).thenReturn(FIXED_NOW);
 
 		taskDeleteService.deleteTask("user-1", 1L);
@@ -57,11 +58,11 @@ class TaskDeleteServiceTest {
 	@Test
 	@DisplayName("存在しないタスクは 404 用例外を投げる")
 	void deleteTaskThrowsTaskNotFoundExceptionWhenTaskIsMissing() {
-		when(taskRepository.findByIdAndUserIdAndDeletedFalse(999L, "user-1")).thenReturn(Optional.empty());
+		when(taskRepository.findByIdAndUserIdAndDeletedFalse(999L, "user-1"))
+				.thenReturn(Optional.empty());
 
 		assertThatThrownBy(() -> taskDeleteService.deleteTask("user-1", 999L))
-			.isInstanceOf(TaskNotFoundException.class)
-			.hasMessage("タスクが見つかりません");
+				.isInstanceOf(TaskNotFoundException.class).hasMessage("タスクが見つかりません");
 		verify(taskRepository).findByIdAndUserIdAndDeletedFalse(999L, "user-1");
 	}
 
@@ -73,7 +74,8 @@ class TaskDeleteServiceTest {
 	 * @return ID 設定済みタスク
 	 */
 	private Task taskWithId(Long id, String userId) {
-		Task task = new Task(userId, "title", "description", TaskStatus.TODO, CREATED_AT, OLD_UPDATED_AT);
+		Task task =
+				new Task(userId, "title", "description", TaskStatus.TODO, CREATED_AT, OLD_UPDATED_AT);
 		ReflectionTestUtils.setField(task, "id", id);
 		return task;
 	}
