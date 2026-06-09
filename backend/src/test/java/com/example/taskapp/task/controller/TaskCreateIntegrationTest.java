@@ -1,7 +1,9 @@
 package com.example.taskapp.task.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.endsWith;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,6 +30,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 @SpringBootTest
@@ -58,16 +61,29 @@ class TaskCreateIntegrationTest {
 	class Created {
 
 		@Test
-		@DisplayName("有効なリクエストで作成したタスクを返す")
+		@DisplayName("有効なリクエストで作成したタスクを取得できる")
 		void createTaskReturnsCreatedTask() throws Exception {
 			// Act & Assert
-			mockMvc.perform(post("/users/user-1/tasks")
+			MvcResult created = mockMvc.perform(post("/users/user-1/tasks")
 					.contentType(MediaType.APPLICATION_JSON)
 					.content("""
 						{"title":"買い物メモ","description":"週末まで","status":"TODO"}
 						"""))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.id").isNumber())
+				.andExpect(jsonPath("$.userId").value("user-1"))
+				.andExpect(jsonPath("$.title").value("買い物メモ"))
+				.andExpect(jsonPath("$.description").value("週末まで"))
+				.andExpect(jsonPath("$.status").value("TODO"))
+				.andExpect(jsonPath("$.createdAt", endsWith("+09:00")))
+				.andExpect(jsonPath("$.updatedAt", endsWith("+09:00")))
+				.andReturn();
+
+			String taskLocation = created.getResponse().getHeader("Location");
+			assertThat(taskLocation).startsWith("/users/user-1/tasks/");
+
+			mockMvc.perform(get(taskLocation))
+				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.userId").value("user-1"))
 				.andExpect(jsonPath("$.title").value("買い物メモ"))
 				.andExpect(jsonPath("$.description").value("週末まで"))
