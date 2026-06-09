@@ -141,6 +141,8 @@ curl -i "http://localhost:8080/users/user-1/tasks/${TASK_ID}"
 
 ## 12. 入力不正を確認する
 
+### 不正 status
+
 ```bash
 curl -i -X POST "http://localhost:8080/users/user-1/tasks" \
   -H "Content-Type: application/json" \
@@ -153,3 +155,43 @@ curl -i -X POST "http://localhost:8080/users/user-1/tasks" \
 - `code` は `400`。
 - `message` が含まれる。
 - 必要に応じて `details` に入力項目の補足が含まれる。
+
+### body 必須項目不足
+
+```bash
+curl -i -X POST "http://localhost:8080/users/user-1/tasks" \
+  -H "Content-Type: application/json" \
+  -d '{"description":"必須項目なし"}'
+```
+
+期待結果:
+
+- HTTP `400 Bad Request`
+- レスポンスは `code: 400` と `message: "入力値が不正です"` を含む。
+- `details` に `title` と `status` の不足が含まれる。
+
+### userId 空白
+
+```bash
+curl -i -X POST "http://localhost:8080/users/%20/tasks" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"買い物メモ","status":"TODO"}'
+```
+
+期待結果:
+
+- HTTP `400 Bad Request`
+- レスポンスは `code: 400` と `message: "入力値が不正です"` を含む。
+- `details` に `field: "userId"` と `message: "userId は必須です"` が含まれる。
+
+### taskId 型変換失敗
+
+```bash
+curl -i "http://localhost:8080/users/user-1/tasks/not-a-number"
+```
+
+期待結果:
+
+- HTTP `400 Bad Request`
+- レスポンスは `code: 400` と `message: "入力値が不正です"` を含む。
+- `details` に `field: "taskId"` と `message: "taskId の形式が不正です"` が含まれる。

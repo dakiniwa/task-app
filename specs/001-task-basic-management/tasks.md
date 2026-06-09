@@ -163,16 +163,16 @@
 
 **独立テスト**: `@Valid @RequestBody`、`@PathVariable`、型変換失敗の各入力不正で HTTP 400 と `ErrorResponse` が返り、body DTO の field は `request` ではなく `title` / `status` として返ることを確認する。
 
-- [ ] T044 [P] `backend/src/test/java/com/example/taskapp/common/exception/GlobalExceptionHandlerTest.java` に `MethodArgumentNotValidException` と `HandlerMethodValidationException` の両方が `ErrorResponse` の `details.field` を正しく返す単体テストを追加する
-- [ ] T045 [P] `backend/src/test/java/com/example/taskapp/task/controller/TaskCreateIntegrationTest.java` の必須項目不足テストを `@Validated` に依存しない期待値として維持し、不足する場合は `title` / `status` の 400 details 検証を追加する
-- [ ] T046 [P] `backend/src/test/java/com/example/taskapp/task/controller/TaskUpdateIntegrationTest.java` の必須項目不足テストを `@Validated` に依存しない期待値として維持し、不足する場合は `title` / `status` の 400 details 検証を追加する
-- [ ] T047 [P] `backend/src/test/java/com/example/taskapp/task/controller/TaskReadIntegrationTest.java` と `backend/src/test/java/com/example/taskapp/task/controller/TaskDeleteIntegrationTest.java` の `userId` 空白テストを維持し、`taskId` 型変換失敗が共通 400 details を返す統合テストを追加する
-- [ ] T048 `backend/src/main/java/com/example/taskapp/common/exception/GlobalExceptionHandler.java` で `MethodArgumentNotValidException` と `HandlerMethodValidationException` の `@ExceptionHandler` は分けたまま、`ErrorDetail` 変換と `badRequest` 生成を共通 private method に整理する
-- [ ] T049 `backend/src/main/java/com/example/taskapp/common/exception/GlobalExceptionHandler.java` で `HandlerMethodValidationException` の `ParameterErrors` から `FieldError` を取り出し、DTO 内 field を `request` ではなく `title` / `status` として返す処理を実装する
-- [ ] T050 `backend/src/main/java/com/example/taskapp/common/exception/GlobalExceptionHandler.java` に `MethodArgumentTypeMismatchException` と `MissingServletRequestParameterException` を 400 の `ErrorResponse` に変換する handler を追加する
-- [ ] T051 `backend/src/main/java/com/example/taskapp/task/controller/TaskCreateController.java`、`backend/src/main/java/com/example/taskapp/task/controller/TaskReadController.java`、`backend/src/main/java/com/example/taskapp/task/controller/TaskUpdateController.java`、`backend/src/main/java/com/example/taskapp/task/controller/TaskDeleteController.java` からクラスレベルの `@Validated` と未使用 import を削除し、Controller 側は `@Valid` と各 path/query 制約だけを残す
-- [ ] T052 `backend/pom.xml` を基点に `cd backend && ./mvnw test` を実行し、例外ハンドラー改善後も `GlobalExceptionHandlerTest`、`TaskCreateIntegrationTest`、`TaskReadIntegrationTest`、`TaskUpdateIntegrationTest`、`TaskDeleteIntegrationTest` が通ることを確認する
-- [ ] T053 `specs/001-task-basic-management/quickstart.md` に入力不正確認として body 必須項目不足、`userId` 空白、`taskId` 型変換失敗の代表 curl と期待する共通 400 レスポンスを追記する
+- [X] T044 [P] `backend/src/test/java/com/example/taskapp/common/exception/GlobalExceptionHandlerTest.java` に `MethodArgumentNotValidException` と `HandlerMethodValidationException` の両方が `ErrorResponse` の `details.field` を正しく返す単体テストを追加する
+- [X] T045 [P] `backend/src/test/java/com/example/taskapp/task/controller/TaskCreateIntegrationTest.java` の必須項目不足テストを `@Validated` に依存しない期待値として維持し、不足する場合は `title` / `status` の 400 details 検証を追加する
+- [X] T046 [P] `backend/src/test/java/com/example/taskapp/task/controller/TaskUpdateIntegrationTest.java` の必須項目不足テストを `@Validated` に依存しない期待値として維持し、不足する場合は `title` / `status` の 400 details 検証を追加する
+- [X] T047 [P] `backend/src/test/java/com/example/taskapp/task/controller/TaskReadIntegrationTest.java` と `backend/src/test/java/com/example/taskapp/task/controller/TaskDeleteIntegrationTest.java` の `userId` 空白テストを維持し、`taskId` 型変換失敗が共通 400 details を返す統合テストを追加する
+- [X] T048 `backend/src/main/java/com/example/taskapp/common/exception/GlobalExceptionHandler.java` で `MethodArgumentNotValidException` と `HandlerMethodValidationException` の `@ExceptionHandler` は分けたまま、`ErrorDetail` 変換と `badRequest` 生成を共通 private method に整理する
+- [X] T049 `backend/src/main/java/com/example/taskapp/common/exception/GlobalExceptionHandler.java` で `HandlerMethodValidationException` の `ParameterErrors` から `FieldError` を取り出し、DTO 内 field を `request` ではなく `title` / `status` として返す処理を実装する
+- [X] T050 `backend/src/main/java/com/example/taskapp/common/exception/GlobalExceptionHandler.java` に `MethodArgumentTypeMismatchException` と `MissingServletRequestParameterException` を 400 の `ErrorResponse` に変換する handler を追加する
+- [X] T051 `backend/src/main/java/com/example/taskapp/task/controller/TaskCreateController.java`、`backend/src/main/java/com/example/taskapp/task/controller/TaskReadController.java`、`backend/src/main/java/com/example/taskapp/task/controller/TaskUpdateController.java`、`backend/src/main/java/com/example/taskapp/task/controller/TaskDeleteController.java` からクラスレベルの `@Validated` と未使用 import を削除し、Controller 側は `@Valid` と各 path/query 制約だけを残す
+- [X] T052 `backend/pom.xml` を基点に `cd backend && ./mvnw test` を実行し、例外ハンドラー改善後も `GlobalExceptionHandlerTest`、`TaskCreateIntegrationTest`、`TaskReadIntegrationTest`、`TaskUpdateIntegrationTest`、`TaskDeleteIntegrationTest` が通ることを確認する
+- [X] T053 `specs/001-task-basic-management/quickstart.md` に入力不正確認として body 必須項目不足、`userId` 空白、`taskId` 型変換失敗の代表 curl と期待する共通 400 レスポンスを追記する
 
 **チェックポイント**: Spring の内部例外型が `MethodArgumentNotValidException` でも `HandlerMethodValidationException` でも、API 利用者へ返る `ErrorResponse` の構造と field 名が安定している。
 
