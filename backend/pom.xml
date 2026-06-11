@@ -19,19 +19,71 @@
 	<!-- プロパティ設定 -->
 	<properties>
 		<java.version>25</java.version>
+		<dbunit.version>3.0.0</dbunit.version>
+		<argLine/>
 	</properties>
 	
 	<!-- 依存関係設定 -->
 	<dependencies>
 
+		<!-- REST API と Web MVC を提供する。 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+		<!-- JPA と Repository による DB アクセスを提供する。 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+		<!-- DTO やパスパラメータの入力バリデーションを提供する。 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
+		<!-- 通常実行時に PostgreSQL へ接続するための JDBC ドライバ。 -->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- JUnit、AssertJ、Mockito などの基本テスト機能を提供する。 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Spring Boot のテスト用 auto-configuration を提供する。 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-test-autoconfigure</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- MockMvc を auto-configuration で利用するための Web MVC テスト機能。 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- test profile で使用するインメモリ DB。 -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Repository 統合テストで既知データを投入するために使用する。 -->
+		<dependency>
+			<groupId>org.dbunit</groupId>
+			<artifactId>dbunit</artifactId>
+			<version>${dbunit.version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -40,9 +92,30 @@
 	<!-- プラグイン設定 -->
 	<build>
 		<plugins>
+			<!-- Spring Boot アプリケーションのビルドと実行を補助する。 -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<!-- Mockito の jar パスを Maven プロパティとして解決する。 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>properties</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Mockito の動的 Java Agent 読み込み警告を避けるため、テスト JVM 起動時に明示的に読み込む。 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>@{argLine} -javaagent:${org.mockito:mockito-core:jar}</argLine>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

@@ -1,88 +1,66 @@
-# Implementation Plan: [FEATURE]
+# 実装計画: [FEATURE]
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
+**Branch**: `[###-feature-name]` | **日付**: [DATE] | **仕様**: [link]
+**入力**: `/specs/[###-feature-name]/spec.md` の機能仕様
 
-**Note**: This template is filled in by the `/speckit-plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
+**注記**: このテンプレートは `/speckit-plan` コマンドで埋める。実行ワークフローは `.specify/templates/plan-template.md` を参照する。
 
-## Summary
+## 概要
 
-[Extract from feature spec: primary requirement + technical approach from research]
+[機能仕様から主要要件と技術アプローチを抽出する]
 
-## Technical Context
+## 技術コンテキスト
 
 <!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
+  対応必須: このセクションをプロジェクト・機能に合わせた技術詳細へ置き換える。
+  以下の構造は反復を進めるためのガイドである。
 -->
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [e.g., library/cli/web-service/mobile-app/compiler/desktop-app or NEEDS CLARIFICATION]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**言語/バージョン**: [例: Java 25, TypeScript など。不明なら 要確認]
+**主要依存関係**: [例: Spring Boot, Next.js など。不明なら 要確認]
+**ストレージ**: [該当する場合: PostgreSQL など。該当なしなら N/A]
+**テスト**: [例: JUnit, npm test など。不明なら 要確認]
+**対象プラットフォーム**: [例: Webアプリケーション、ローカル開発環境など。不明なら 要確認]
+**プロジェクト種別**: [例: web-service, web-application など。不明なら 要確認]
+**性能目標**: [ドメイン固有の目標。不明なら 要確認]
+**制約**: [ドメイン固有の制約。不明なら 要確認]
+**スケール/スコープ**: [対象ユーザー数、画面数、API数など。不明なら 要確認]
 
-## Constitution Check
+## 憲章チェック
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+*GATE: Phase 0 research の前に合格必須。Phase 1 design 後に再確認する。*
 
-- **Source alignment**: Confirm the nearest `AGENTS.md`,
-  `docs/task_app_design_detailed.md`, and relevant `docs/` feature files have
-  been read. Record any conflicts and resolve stale docs before implementation.
-- **Backend API first**: Plan backend domain, repository, service, controller,
-  DTOs, API contract, and API verification before frontend integration tasks.
-- **REST/user scope**: Task endpoints use plural resource paths, contain no
-  verbs, and include `userId`, e.g. `/users/{userId}/tasks/{taskId}`.
-- **Domain invariants**: Task status remains `TODO` / `DOING` / `DONE`; delete
-  behavior is logical delete; task timestamps and `userId` are preserved.
-- **Boundary separation**: Backend Entity/Enum and DTO types are separate;
-  controller calls service only; service calls repository only; frontend API DTO
-  types and UI state are separate.
-- **Validation and observability**: DTO validation, service business validation,
-  common error responses, 4xx/5xx logging, and API/manual verification are
-  included for success, validation failure, not-found, and delete flows.
+- **仕様参照**: 最寄りの `AGENTS.md`、`.specify/memory/constitution.md`、関連する `specs/` 配下の機能仕様成果物を確認する。矛盾があれば記録し、実装前に解消する。
+- **バックエンドAPI先行**: フロントエンド統合タスクより前に、バックエンドの domain、repository、service、controller、DTO、API契約、API検証を計画する。
+- **REST/user scope**: Task エンドポイントは複数形リソースパスを使い、動詞を含めず、`userId` を含める。例: `/users/{userId}/tasks/{taskId}`。
+- **ドメイン不変条件**: Task status は `TODO` / `DOING` / `DONE` のみとする。削除は論理削除とし、Task の timestamps と `userId` を保持する。
+- **境界分離**: バックエンド Entity/Enum と DTO を分離する。controller は service のみを呼び、service は repository のみを呼ぶ。フロントエンドのAPI DTOとUI状態も分離する。
+- **バリデーションと観測性**: DTOバリデーション、Serviceの業務バリデーション、共通エラーレスポンス、4xx/5xxログ、成功・入力不正・未検出・削除フローのAPI/手動検証を含める。
+- **日本語成果物**: `spec.md`, `plan.md`, `tasks.md`, `research.md`, `data-model.md`, `quickstart.md`, `contracts/` 配下の文書、チェックリスト、報告は日本語で作成する。
+- **Jiraブランチ運用**: メインタスクは `feature/SCRUM-x`、サブタスクは `feature/sub/SCRUM-x` を使う。サブタスク完了時は親featureブランチへ、全サブタスク完了後は親featureブランチから `main` へPull Requestを作成する。
 
-## Project Structure
+## プロジェクト構成
 
-### Documentation (this feature)
+### ドキュメント (この機能)
 
 ```text
 specs/[###-feature]/
-├── plan.md              # This file (/speckit-plan command output)
-├── research.md          # Phase 0 output (/speckit-plan command)
-├── data-model.md        # Phase 1 output (/speckit-plan command)
-├── quickstart.md        # Phase 1 output (/speckit-plan command)
-├── contracts/           # Phase 1 output (/speckit-plan command)
-└── tasks.md             # Phase 2 output (/speckit-tasks command - NOT created by /speckit-plan)
+├── plan.md              # このファイル (/speckit-plan の出力)
+├── research.md          # Phase 0 の出力 (/speckit-plan)
+├── data-model.md        # Phase 1 の出力 (/speckit-plan)
+├── quickstart.md        # Phase 1 の出力 (/speckit-plan)
+├── contracts/           # Phase 1 の出力 (/speckit-plan)
+└── tasks.md             # Phase 2 の出力 (/speckit-tasks。/speckit-plan では作成しない)
 ```
 
-### Source Code (repository root)
+### ソースコード (リポジトリルート)
+
 <!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
+  対応必須: 下のプレースホルダーツリーを、この機能の実際の構成へ置き換える。
+  未使用の選択肢は削除し、採用した構成を実パスで展開する。
 -->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
-
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# Web application layout for this project
 backend/
 ├── src/main/java/com/example/taskapp/
 │   ├── task/
@@ -108,23 +86,15 @@ frontend/
 │   │       └── hooks/
 │   └── shared/
 └── [tests if configured]
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**構成判断**: [採用した構成と、その根拠となる実ディレクトリを記録する]
 
-## Complexity Tracking
+## 複雑性の追跡
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
+> **憲章チェック違反があり、正当化が必要な場合のみ記入する**
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+| 違反 | 必要な理由 | よりシンプルな代替案を却下した理由 |
+|------|------------|------------------------------------|
+| [例: 追加プロジェクト] | [現在必要な理由] | [既存構成では不十分な理由] |
+| [例: 追加抽象化] | [具体的な問題] | [直接実装では不十分な理由] |

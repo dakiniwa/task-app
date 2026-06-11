@@ -16,6 +16,12 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Output Language
+
+- Generate `plan.md`, `research.md`, `data-model.md`, `quickstart.md`, `contracts/` documents, and final reports in Japanese.
+- Keep code identifiers, API paths, HTTP methods, enum values, file paths, commands, and technology names in their original notation when clearer.
+- Use `要確認` for unresolved items in generated Japanese artifacts instead of leaving English placeholder text.
+
 ## Pre-Execution Checks
 
 **Check for extension hooks (before planning)**:
@@ -57,13 +63,13 @@ You **MUST** consider the user input before proceeding (if not empty).
 2. **Load context**: Read FEATURE_SPEC and `.specify/memory/constitution.md`. Load IMPL_PLAN template (already copied).
 
 3. **Execute plan workflow**: Follow the structure in IMPL_PLAN template to:
-   - Fill Technical Context (mark unknowns as "NEEDS CLARIFICATION")
-   - Fill Constitution Check section from constitution
+   - Fill Technical Context in Japanese (mark unknowns as "要確認")
+   - Fill Constitution Check section from constitution in Japanese
    - Evaluate gates (ERROR if violations unjustified)
-   - Phase 0: Generate research.md (resolve all NEEDS CLARIFICATION)
-   - Phase 1: Generate data-model.md, contracts/, quickstart.md
+   - Phase 0: Generate research.md in Japanese (resolve all 要確認)
+   - Phase 1: Generate data-model.md, contracts/, quickstart.md in Japanese
    - Phase 1: Update agent context by running the agent script
-   - Re-evaluate Constitution Check post-design
+   - Re-evaluate Constitution Check post-design in Japanese
 
 4. **Stop and report**: Command ends after Phase 2 planning. Report branch, IMPL_PLAN path, and generated artifacts.
 
@@ -101,7 +107,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 ### Phase 0: Outline & Research
 
 1. **Extract unknowns from Technical Context** above:
-   - For each NEEDS CLARIFICATION → research task
+   - For each 要確認 → research task
    - For each dependency → best practices task
    - For each integration → patterns task
 
@@ -115,11 +121,11 @@ You **MUST** consider the user input before proceeding (if not empty).
    ```
 
 3. **Consolidate findings** in `research.md` using format:
-   - Decision: [what was chosen]
-   - Rationale: [why chosen]
-   - Alternatives considered: [what else evaluated]
+   - 決定: [選択した内容]
+   - 根拠: [選択理由]
+   - 検討した代替案: [評価した他の選択肢]
 
-**Output**: research.md with all NEEDS CLARIFICATION resolved
+**Output**: research.md with all 要確認 resolved
 
 ### Phase 1: Design & Contracts
 

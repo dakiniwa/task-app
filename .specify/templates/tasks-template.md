@@ -1,259 +1,253 @@
 ---
 
-description: "Task list template for feature implementation"
+description: "機能実装用タスクリストテンプレート"
 ---
 
-# Tasks: [FEATURE NAME]
+# タスク: [FEATURE NAME]
 
-**Input**: Design documents from `/specs/[###-feature-name]/`
-**Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
+**入力**: `/specs/[###-feature-name]/` の設計ドキュメント
+**前提**: plan.md (必須), spec.md (ユーザーストーリーには必須), research.md, data-model.md, contracts/
 
-**Tests**: Include verification tasks required by the feature specification and
-constitution. Backend API changes need tests or explicit manual verification for
-success, validation failure, not-found, and logical-delete paths.
+**テスト**: 機能仕様と憲章で求められる検証タスクを含める。バックエンドAPI変更では、成功、入力不正、未検出、論理削除パスについて、テストまたは明示的な手動検証を含める。
 
-**Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
+**構成**: 各ユーザーストーリーを独立して実装・テストできるように、タスクはユーザーストーリー単位でグループ化する。
 
-## Format: `[ID] [P?] [Story] Description`
+## 形式: `[ID] [P?] [Story] 説明`
 
-- **[P]**: Can run in parallel (different files, no dependencies)
-- **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
-- Include exact file paths in descriptions
+- **[P]**: 並列実行可能。別ファイルで、未完了タスクへの依存がない。
+- **[Story]**: 対象ユーザーストーリー。例: US1, US2, US3。
+- 説明には正確なファイルパスを含める。
 
-## Path Conventions
+## パス規約
 
-- **Backend**: `backend/src/main/java/com/example/taskapp/`,
-  `backend/src/test/`
-- **Frontend**: `frontend/src/app/`, `frontend/src/features/tasks/`,
-  `frontend/src/shared/`
-- **Docs**: `docs/`, feature-specific files under `docs/team-tasks-lite/`
-- Paths in generated tasks MUST use the concrete paths from plan.md
+- **Backend**: `backend/src/main/java/com/example/taskapp/`, `backend/src/test/`
+- **Frontend**: `frontend/src/app/`, `frontend/src/features/tasks/`, `frontend/src/shared/`
+- **Docs**: `docs/`, 機能固有の `specs/` 配下ドキュメント
+- 生成されるタスクのパスは plan.md の具体パスを使わなければならない。
 
-<!-- 
+<!--
   ============================================================================
-  IMPORTANT: The tasks below are SAMPLE TASKS for illustration purposes only.
-  
-  The /speckit-tasks command MUST replace these with actual tasks based on:
-  - User stories from spec.md (with their priorities P1, P2, P3...)
-  - Feature requirements from plan.md
-  - Entities from data-model.md
-  - Endpoints from contracts/
-  
-  Tasks MUST be organized by user story so each story can be:
-  - Implemented independently
-  - Tested independently
-  - Delivered as an MVP increment
-  
-  DO NOT keep these sample tasks in the generated tasks.md file.
+  重要: 以下のタスクは説明用サンプルである。
+
+  /speckit-tasks コマンドは、次に基づいて実タスクへ置き換えなければならない:
+  - spec.md のユーザーストーリーと優先度 P1, P2, P3...
+  - plan.md の機能要件
+  - data-model.md のエンティティ
+  - contracts/ のエンドポイント
+
+  タスクはユーザーストーリー単位で整理し、各ストーリーが独立して実装・テスト・
+  MVP提供できるようにする。
+
+  生成された tasks.md に、このサンプルタスクを残してはならない。
   ============================================================================
 -->
 
-## Phase 1: Setup (Shared Infrastructure)
+## Phase 1: セットアップ (共有基盤)
 
-**Purpose**: Project initialization and basic structure
+**目的**: プロジェクト初期化と基本構成を整える。
 
-- [ ] T001 Create project structure per implementation plan
-- [ ] T002 Initialize [language] project with [framework] dependencies
-- [ ] T003 [P] Configure linting and formatting tools
-
----
-
-## Phase 2: Foundational (Blocking Prerequisites)
-
-**Purpose**: Core infrastructure that MUST be complete before ANY user story can be implemented
-
-**⚠️ CRITICAL**: No user story work can begin until this phase is complete
-
-Examples of foundational tasks (adjust based on your project):
-
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Create backend package structure under `backend/src/main/java/com/example/taskapp/`
-- [ ] T006 [P] Setup REST routing, validation, and common exception handling
-- [ ] T007 Create Task domain model, DTO conventions, repository conventions, and logical delete support
-- [ ] T008 Configure logging for 4xx/5xx API errors
-- [ ] T009 Setup frontend API base URL handling with `NEXT_PUBLIC_API_BASE_URL`
-
-**Checkpoint**: Foundation ready - user story implementation can now begin in parallel
+- [ ] T001 実装計画に従ってプロジェクト構成を確認する
+- [ ] T002 [language] プロジェクトに [framework] 依存関係を設定する
+- [ ] T003 [P] lint/format ツール設定を確認する
 
 ---
 
-## Phase 3: User Story 1 - [Title] (Priority: P1) 🎯 MVP
+## Phase 2: 基盤 (ブロッキング前提)
 
-**Goal**: [Brief description of what this story delivers]
+**目的**: いずれのユーザーストーリー実装より前に完了必須の中核基盤を整える。
 
-**Independent Test**: [How to verify this story works on its own]
+**重要**: このフェーズが完了するまで、ユーザーストーリー作業を開始してはならない。
 
-### Tests for User Story 1
+基盤タスク例 (プロジェクトに合わせて調整する):
 
-> **NOTE: Add backend API tests or manual verification tasks before implementation when this story changes API behavior.**
+- [ ] T004 DBスキーマとマイグレーション方針を設定する
+- [ ] T005 [P] `backend/src/main/java/com/example/taskapp/` 配下のパッケージ構成を作成する
+- [ ] T006 [P] RESTルーティング、バリデーション、共通例外処理を設定する
+- [ ] T007 Taskドメインモデル、DTO規約、Repository規約、論理削除サポートを作成する
+- [ ] T008 4xx/5xx APIエラーのログ出力を設定する
+- [ ] T009 `NEXT_PUBLIC_API_BASE_URL` によるフロントエンドAPIベースURL設定を用意する
 
-- [ ] T010 [P] [US1] Backend API verification for `[endpoint]` in `backend/src/test/...`
-- [ ] T011 [P] [US1] Frontend/manual verification for `[user journey]` if UI changes
-
-### Implementation for User Story 1
-
-- [ ] T012 [P] [US1] Create/update domain Entity or Enum in `backend/src/main/java/com/example/taskapp/task/domain/`
-- [ ] T013 [P] [US1] Create/update request and response DTOs in `backend/src/main/java/com/example/taskapp/task/dto/`
-- [ ] T014 [US1] Implement repository query in `backend/src/main/java/com/example/taskapp/task/repository/`
-- [ ] T015 [US1] Implement service logic and transaction boundary in `backend/src/main/java/com/example/taskapp/task/service/`
-- [ ] T016 [US1] Implement REST controller endpoint in `backend/src/main/java/com/example/taskapp/task/controller/`
-- [ ] T017 [US1] Add frontend API client/types in `frontend/src/features/tasks/api/` and `frontend/src/features/tasks/types/` if UI changes
-- [ ] T018 [US1] Add/update UI components and hooks in `frontend/src/features/tasks/` if UI changes
-
-**Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
+**チェックポイント**: 基盤が整い、ユーザーストーリー実装を並列開始できる。
 
 ---
 
-## Phase 4: User Story 2 - [Title] (Priority: P2)
+## Phase 3: ユーザーストーリー 1 - [Title] (Priority: P1) MVP
 
-**Goal**: [Brief description of what this story delivers]
+**Goal**: [このストーリーが提供する内容を簡潔に説明する]
 
-**Independent Test**: [How to verify this story works on its own]
+**独立テスト**: [このストーリー単体で動作確認する方法]
 
-### Tests for User Story 2
+### ユーザーストーリー 1 のテスト
 
-- [ ] T019 [P] [US2] Backend API verification for `[endpoint]` in `backend/src/test/...`
-- [ ] T020 [P] [US2] Frontend/manual verification for `[user journey]` if UI changes
+> **注記: APIの振る舞いが変わるストーリーでは、実装前にバックエンドAPIテストまたは手動検証タスクを追加する。**
 
-### Implementation for User Story 2
+- [ ] T010 [P] [US1] `backend/src/test/...` に `[endpoint]` のバックエンドAPI検証を追加する
+- [ ] T011 [P] [US1] UI変更がある場合、`[user journey]` のフロントエンド/手動検証を追加する
 
-- [ ] T021 [P] [US2] Create/update backend DTO/domain pieces in the task package
-- [ ] T022 [US2] Implement service and repository behavior
-- [ ] T023 [US2] Implement REST endpoint/controller behavior
-- [ ] T024 [US2] Integrate frontend API client and UI pieces if needed
+### ユーザーストーリー 1 の実装
 
-**Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
+- [ ] T012 [P] [US1] `backend/src/main/java/com/example/taskapp/task/domain/` に domain Entity または Enum を作成・更新する
+- [ ] T013 [P] [US1] `backend/src/main/java/com/example/taskapp/task/dto/` に request/response DTO を作成・更新する
+- [ ] T014 [US1] `backend/src/main/java/com/example/taskapp/task/repository/` に Repository query を実装する
+- [ ] T015 [US1] `backend/src/main/java/com/example/taskapp/task/service/` に Service logic と transaction boundary を実装する
+- [ ] T016 [US1] `backend/src/main/java/com/example/taskapp/task/controller/` に REST controller endpoint を実装する
+- [ ] T017 [US1] UI変更がある場合、`frontend/src/features/tasks/api/` と `frontend/src/features/tasks/types/` にAPI client/typesを追加する
+- [ ] T018 [US1] UI変更がある場合、`frontend/src/features/tasks/` にcomponents/hooksを追加・更新する
 
----
-
-## Phase 5: User Story 3 - [Title] (Priority: P3)
-
-**Goal**: [Brief description of what this story delivers]
-
-**Independent Test**: [How to verify this story works on its own]
-
-### Tests for User Story 3
-
-- [ ] T025 [P] [US3] Backend API verification for `[endpoint]` in `backend/src/test/...`
-- [ ] T026 [P] [US3] Frontend/manual verification for `[user journey]` if UI changes
-
-### Implementation for User Story 3
-
-- [ ] T027 [P] [US3] Create/update backend DTO/domain pieces in the task package
-- [ ] T028 [US3] Implement service and repository behavior
-- [ ] T029 [US3] Implement REST endpoint/controller behavior
-- [ ] T030 [US3] Integrate frontend API client and UI pieces if needed
-
-**Checkpoint**: All user stories should now be independently functional
+**チェックポイント**: ユーザーストーリー 1 が単体で完全に機能し、独立してテストできる。
 
 ---
 
-[Add more user story phases as needed, following the same pattern]
+## Phase 4: ユーザーストーリー 2 - [Title] (Priority: P2)
+
+**Goal**: [このストーリーが提供する内容を簡潔に説明する]
+
+**独立テスト**: [このストーリー単体で動作確認する方法]
+
+### ユーザーストーリー 2 のテスト
+
+- [ ] T019 [P] [US2] `backend/src/test/...` に `[endpoint]` のバックエンドAPI検証を追加する
+- [ ] T020 [P] [US2] UI変更がある場合、`[user journey]` のフロントエンド/手動検証を追加する
+
+### ユーザーストーリー 2 の実装
+
+- [ ] T021 [P] [US2] task package の backend DTO/domain 部品を作成・更新する
+- [ ] T022 [US2] Service と Repository の振る舞いを実装する
+- [ ] T023 [US2] REST endpoint/controller の振る舞いを実装する
+- [ ] T024 [US2] 必要に応じてフロントエンドAPI clientとUI部品を統合する
+
+**チェックポイント**: ユーザーストーリー 1 と 2 がどちらも独立して機能する。
 
 ---
 
-## Phase N: Polish & Cross-Cutting Concerns
+## Phase 5: ユーザーストーリー 3 - [Title] (Priority: P3)
 
-**Purpose**: Improvements that affect multiple user stories
+**Goal**: [このストーリーが提供する内容を簡潔に説明する]
 
-- [ ] TXXX [P] Documentation updates in docs/
-- [ ] TXXX Code cleanup and refactoring
-- [ ] TXXX Performance optimization across all stories
-- [ ] TXXX [P] Additional backend tests in `backend/src/test/`
-- [ ] TXXX [P] Additional frontend checks in `frontend/` if UI changed
-- [ ] TXXX Security hardening
-- [ ] TXXX Run quickstart.md validation
+**独立テスト**: [このストーリー単体で動作確認する方法]
 
----
+### ユーザーストーリー 3 のテスト
 
-## Dependencies & Execution Order
+- [ ] T025 [P] [US3] `backend/src/test/...` に `[endpoint]` のバックエンドAPI検証を追加する
+- [ ] T026 [P] [US3] UI変更がある場合、`[user journey]` のフロントエンド/手動検証を追加する
 
-### Phase Dependencies
+### ユーザーストーリー 3 の実装
 
-- **Setup (Phase 1)**: No dependencies - can start immediately
-- **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
-- **User Stories (Phase 3+)**: All depend on Foundational phase completion
-  - User stories can then proceed in parallel (if staffed)
-  - Or sequentially in priority order (P1 → P2 → P3)
-- **Polish (Final Phase)**: Depends on all desired user stories being complete
+- [ ] T027 [P] [US3] task package の backend DTO/domain 部品を作成・更新する
+- [ ] T028 [US3] Service と Repository の振る舞いを実装する
+- [ ] T029 [US3] REST endpoint/controller の振る舞いを実装する
+- [ ] T030 [US3] 必要に応じてフロントエンドAPI clientとUI部品を統合する
 
-### User Story Dependencies
-
-- **User Story 1 (P1)**: Can start after Foundational (Phase 2) - No dependencies on other stories
-- **User Story 2 (P2)**: Can start after Foundational (Phase 2) - May integrate with US1 but should be independently testable
-- **User Story 3 (P3)**: Can start after Foundational (Phase 2) - May integrate with US1/US2 but should be independently testable
-
-### Within Each User Story
-
-- Tests (if included) MUST be written and FAIL before implementation
-- Domain/DTOs before repositories and services
-- Services before controllers/endpoints
-- Backend API verification before frontend integration
-- Core implementation before integration
-- Story complete before moving to next priority
-
-### Parallel Opportunities
-
-- All Setup tasks marked [P] can run in parallel
-- All Foundational tasks marked [P] can run in parallel (within Phase 2)
-- Once Foundational phase completes, all user stories can start in parallel (if team capacity allows)
-- All tests for a user story marked [P] can run in parallel
-- Models within a story marked [P] can run in parallel
-- Different user stories can be worked on in parallel by different team members
+**チェックポイント**: すべてのユーザーストーリーが独立して機能する。
 
 ---
 
-## Parallel Example: User Story 1
+[必要に応じて、同じ形式でユーザーストーリーフェーズを追加する]
+
+---
+
+## Phase N: 仕上げと横断関心事
+
+**目的**: 複数のユーザーストーリーにまたがる改善。
+
+- [ ] TXXX [P] ドキュメントを更新する
+- [ ] TXXX コード整理とリファクタリングを行う
+- [ ] TXXX 全ストーリー横断の性能最適化を行う
+- [ ] TXXX [P] `backend/src/test/` に追加バックエンドテストを作成する
+- [ ] TXXX [P] UI変更がある場合、`frontend/` の追加確認を行う
+- [ ] TXXX セキュリティ観点の確認を行う
+- [ ] TXXX quickstart.md の検証を実行する
+
+---
+
+## 依存関係と実行順序
+
+### フェーズ依存関係
+
+- **セットアップ (Phase 1)**: 依存なし。すぐ開始できる。
+- **基盤 (Phase 2)**: セットアップ完了に依存し、すべてのユーザーストーリーをブロックする。
+- **ユーザーストーリー (Phase 3+)**: 基盤完了に依存する。
+  - その後、チーム体制に応じて並列実行できる。
+  - または P1 -> P2 -> P3 の優先順で順次実行する。
+- **仕上げ (Final Phase)**: 対象ユーザーストーリー完了に依存する。
+
+### ユーザーストーリー依存関係
+
+- **ユーザーストーリー 1 (P1)**: 基盤完了後に開始できる。他ストーリーへの依存なし。
+- **ユーザーストーリー 2 (P2)**: 基盤完了後に開始できる。US1と統合する場合でも、単体テスト可能にする。
+- **ユーザーストーリー 3 (P3)**: 基盤完了後に開始できる。US1/US2と統合する場合でも、単体テスト可能にする。
+
+### 各ユーザーストーリー内の順序
+
+- テストを含める場合、実装前に作成し、失敗を確認する。
+- Domain/DTOs を Repository/Service より前に作る。
+- Service を Controller/Endpoint より前に作る。
+- フロントエンド統合より前にバックエンドAPI検証を行う。
+- 中核実装を統合より前に完了する。
+- 次の優先度へ進む前に、対象ストーリーを完了させる。
+
+### 並列化できる機会
+
+- [P] が付いたセットアップタスクは並列実行できる。
+- [P] が付いた基盤タスクは Phase 2 内で並列実行できる。
+- 基盤完了後、チーム体制に応じて各ユーザーストーリーを並列開始できる。
+- [P] が付いた同一ストーリー内のテストは並列実行できる。
+- [P] が付いたモデル作成は並列実行できる。
+- 異なるユーザーストーリーは、別担当者が並列に進められる。
+
+---
+
+## 並列実行例: ユーザーストーリー 1
 
 ```bash
-# Launch all verification for User Story 1 together:
-Task: "Backend API verification for [endpoint] in backend/src/test/..."
-Task: "Frontend/manual verification for [user journey] if UI changes"
+# ユーザーストーリー 1 の検証をまとめて開始:
+Task: "backend/src/test/... に [endpoint] のバックエンドAPI検証を追加する"
+Task: "UI変更がある場合、[user journey] のフロントエンド/手動検証を追加する"
 
-# Launch independent backend model/DTO work:
-Task: "Create/update domain model in backend/src/main/java/com/example/taskapp/task/domain/"
-Task: "Create/update DTOs in backend/src/main/java/com/example/taskapp/task/dto/"
+# 独立したバックエンド model/DTO 作業を開始:
+Task: "backend/src/main/java/com/example/taskapp/task/domain/ に domain model を作成・更新する"
+Task: "backend/src/main/java/com/example/taskapp/task/dto/ に DTO を作成・更新する"
 ```
 
 ---
 
-## Implementation Strategy
+## 実装戦略
 
-### MVP First (User Story 1 Only)
+### MVP First (ユーザーストーリー 1 のみ)
 
-1. Complete Phase 1: Setup
-2. Complete Phase 2: Foundational (CRITICAL - blocks all stories)
-3. Complete Phase 3: User Story 1
-4. **STOP and VALIDATE**: Test User Story 1 independently
-5. Deploy/demo if ready
+1. Phase 1: セットアップを完了する。
+2. Phase 2: 基盤を完了する。これはすべてのストーリーをブロックする。
+3. Phase 3: ユーザーストーリー 1 を完了する。
+4. **停止して検証**: ユーザーストーリー 1 を独立してテストする。
+5. 準備できていればデモまたはリリースする。
 
-### Incremental Delivery
+### インクリメンタルデリバリー
 
-1. Complete Setup + Foundational → Foundation ready
-2. Add User Story 1 → Test independently → Deploy/Demo (MVP!)
-3. Add User Story 2 → Test independently → Deploy/Demo
-4. Add User Story 3 → Test independently → Deploy/Demo
-5. Each story adds value without breaking previous stories
+1. セットアップと基盤を完了する。
+2. ユーザーストーリー 1 を追加し、独立テストし、デモまたはリリースする。
+3. ユーザーストーリー 2 を追加し、独立テストし、デモまたはリリースする。
+4. ユーザーストーリー 3 を追加し、独立テストし、デモまたはリリースする。
+5. 各ストーリーは既存ストーリーを壊さずに価値を追加する。
 
-### Parallel Team Strategy
+### 並列チーム戦略
 
-With multiple developers:
+複数開発者がいる場合:
 
-1. Team completes Setup + Foundational together
-2. Once Foundational is done:
-   - Developer A: User Story 1
-   - Developer B: User Story 2
-   - Developer C: User Story 3
-3. Stories complete and integrate independently
+1. チーム全体でセットアップと基盤を完了する。
+2. 基盤完了後:
+   - Developer A: ユーザーストーリー 1
+   - Developer B: ユーザーストーリー 2
+   - Developer C: ユーザーストーリー 3
+3. 各ストーリーを独立して完了・統合する。
 
 ---
 
 ## Notes
 
-- [P] tasks = different files, no dependencies
-- [Story] label maps task to specific user story for traceability
-- Each user story should be independently completable and testable
-- Verify tests fail before implementing
-- Commit after each task or logical group
-- Stop at any checkpoint to validate story independently
-- Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
+- [P] タスクは、別ファイルで依存がないタスクを表す。
+- [Story] ラベルは、タスクとユーザーストーリーの追跡に使う。
+- 各ユーザーストーリーは独立して完了・テストできなければならない。
+- テストを作る場合、実装前に失敗を確認する。
+- タスクまたは論理的なまとまりごとにコミットする。
+- 任意のチェックポイントで停止し、ストーリーを独立検証できる。
+- 曖昧なタスク、同一ファイル競合、独立性を壊すストーリー間依存を避ける。

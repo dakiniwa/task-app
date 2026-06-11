@@ -4,5 +4,7 @@
     // null分析モードを自動に設定
     "java.compile.nullAnalysis.mode": "automatic",
     // ビルド設定を自動更新
-    "java.configuration.updateBuildConfiguration": "automatic"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    // Javaフォーマッター
+    "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml"
 }

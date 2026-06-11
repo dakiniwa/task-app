@@ -16,6 +16,12 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Output Language
+
+- Generate `tasks.md` and final reports in Japanese.
+- Keep task IDs, `[P]`, `[US1]`, file paths, code identifiers, API paths, commands, and technology names in their original notation when clearer.
+- Task descriptions must be actionable Japanese sentences with concrete file paths.
+
 ## Pre-Execution Checks
 
 **Check for extension hooks (before tasks generation)**:

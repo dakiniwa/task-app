@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+  <TASKS ID="1"
+         USER_ID="user-1"
+         TITLE="older"
+         DESCRIPTION="[null]"
+         STATUS="TODO"
+         DELETED="false"
+         CREATED_AT="2026-05-09 00:00:00"
+         UPDATED_AT="2026-05-09 00:00:00"/>
+  <TASKS ID="2"
+         USER_ID="user-1"
+         TITLE="newer"
+         DESCRIPTION="[null]"
+         STATUS="DOING"
+         DELETED="false"
+         CREATED_AT="2026-05-09 01:00:00"
+         UPDATED_AT="2026-05-09 01:00:00"/>
+  <TASKS ID="3"
+         USER_ID="user-1"
+         TITLE="deleted"
+         DESCRIPTION="[null]"
+         STATUS="DONE"
+         DELETED="true"
+         CREATED_AT="2026-05-09 02:00:00"
+         UPDATED_AT="2026-05-09 03:00:00"/>
+  <TASKS ID="4"
+         USER_ID="user-2"
+         TITLE="other user"
+         DESCRIPTION="[null]"
+         STATUS="DONE"
+         DELETED="false"
+         CREATED_AT="2026-05-09 04:00:00"
+         UPDATED_AT="2026-05-09 04:00:00"/>
+</dataset>

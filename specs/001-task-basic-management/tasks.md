@@ -1,0 +1,302 @@
+# タスク: タスク基本管理
+
+**入力**: `/specs/001-task-basic-management/` の設計ドキュメント
+**前提**: plan.md, spec.md, research.md, data-model.md, contracts/openapi.yaml, quickstart.md
+**テスト**: FR-014 により、登録、一覧、詳細、更新、削除、バリデーション、共通エラー、JST 時刻表現の backend 単体テストと統合テストを含める。Repository/JPA の既知データ投入には DBUnit を使う。
+**対象**: backend REST API のみ。frontend 接続は今回の実装対象に含めない。
+
+## テスト方針と命名規約
+
+- **単体テスト**: product class ごとに `プロダクトクラス名 + Test` として作成する。例: `TaskCreateServiceTest`、`TaskReadServiceTest`、`JstDateTimeFormatterTest`、`GlobalExceptionHandlerTest`。
+- **統合テスト**: Spring context、MockMvc、JPA、DBUnit など複数境界を使う検証は `XXXIntegrationTest` として作成する。例: `TaskCreateIntegrationTest`、`TaskRepositoryIntegrationTest`。
+- 各ユーザーストーリーは、Service などの単体テストと API/DB 境界を含む統合テストの両方で独立検証できるようにする。
+- `TaskService` / `TaskController` のような CRUD 集約クラスは作らず、登録・読み取り・更新・削除のユースケース単位で Service / Controller / Test を分ける。
+
+## 形式: `[ID] [P?] [Story] 説明`
+
+- **[P]**: 別ファイルで作業でき、未完了タスクに依存しない並列実行可能タスク。
+- **[Story]**: 対象ユーザーストーリー。Setup、基盤、仕上げには付けない。
+- すべてのタスク説明には具体的なファイルパスを含める。
+
+---
+
+## Phase 1: セットアップ (共有基盤)
+
+**目的**: backend API 実装に必要な依存関係、DB 設定、時刻基盤を整える。
+
+- [X] T001 `backend/pom.xml` に Spring Data JPA、Spring Validation、PostgreSQL JDBC Driver、DBUnit、H2 テスト依存関係を追加する
+- [X] T002 `backend/src/main/resources/application.yaml` に環境変数参照の PostgreSQL datasource と JPA 設定を追加する
+- [X] T003 [P] `backend/src/test/resources/application-test.yaml` に backend テスト用 profile 設定を追加する
+- [X] T004 [P] `backend/src/main/java/com/example/taskapp/common/config/TimeConfig.java` に `ZoneId.of("Asia/Tokyo")` と `Clock` Bean を定義する
+
+---
+
+## Phase 2: 基盤 (ブロッキング前提)
+
+**目的**: すべてのユーザーストーリーに必要なドメイン、永続化、共通エラー、時刻変換の基盤を作る。
+
+**重要**: このフェーズが完了するまで、ユーザーストーリー作業を開始しない。
+
+- [X] T005 [P] `backend/src/main/java/com/example/taskapp/task/domain/TaskStatus.java` に `TODO`、`DOING`、`DONE` のみを持つ enum を作成する
+- [X] T006 `backend/src/main/java/com/example/taskapp/task/domain/Task.java` に `id`、`userId`、`title`、`description`、`status`、`deleted`、`createdAt`、`updatedAt` を持つ JPA Entity を作成する
+- [X] T007 [P] `backend/src/main/java/com/example/taskapp/common/exception/ErrorDetail.java` に共通エラー詳細 DTO を作成する
+- [X] T008 [P] `backend/src/main/java/com/example/taskapp/common/exception/ErrorResponse.java` に `code`、`message`、`details` を持つ共通エラー DTO を作成する
+- [X] T009 [P] `backend/src/main/java/com/example/taskapp/common/exception/TaskNotFoundException.java` に task 未検出用例外を作成する
+- [X] T010 `backend/src/main/java/com/example/taskapp/task/repository/TaskRepository.java` に `findByIdAndUserIdAndDeletedFalse` と `findAllByUserIdAndDeletedFalseOrderByCreatedAtDesc` を持つ Spring Data JPA repository を作成する
+- [X] T011 `backend/src/main/java/com/example/taskapp/common/exception/GlobalExceptionHandler.java` に validation、JSON parse、`TaskNotFoundException`、想定外例外の共通ハンドリングを実装する
+- [X] T012 [P] `backend/src/main/java/com/example/taskapp/common/util/JstDateTimeFormatter.java` に `Instant` を JST オフセット付き ISO-8601 文字列へ変換する utility を作成する
+- [X] T013 [P] `backend/src/test/java/com/example/taskapp/common/util/JstDateTimeFormatterTest.java` に JST オフセット付き ISO-8601 変換の単体テストを追加する
+- [X] T014 [P] `backend/src/test/java/com/example/taskapp/task/repository/TaskRepositoryIntegrationTest.java` に DBUnit を使った userId scope と logical delete の統合テストを追加する
+- [X] T015 [P] `backend/src/test/java/com/example/taskapp/common/exception/GlobalExceptionHandlerTest.java` に 400、404、500 が `ErrorResponse` 形式になる共通例外ハンドリングの単体テストを追加する
+
+**チェックポイント**: Task の永続化、userId scope、論理削除、共通エラー、JST 変換の土台ができ、各ストーリーを実装できる。
+
+---
+
+## Phase 3: ユーザーストーリー 1 - 自分のタスクを登録する (Priority: P1) MVP
+
+**Goal**: 個人ユーザーが `POST /users/{userId}/tasks` でタイトル、任意の説明、ステータスを登録できる。
+
+**独立テスト**: `userId` と有効な request body で登録すると 201 と登録内容が返り、不正 status や必須項目不足では `ErrorResponse` 形式の 400 が返ることを確認する。
+
+### ユーザーストーリー 1 のテスト
+
+- [X] T016 [P] [US1] `backend/src/test/java/com/example/taskapp/task/service/TaskServiceTest.java` に固定 `Clock` と mock repository を使った `createTask` の単体テストを追加する。Phase 4 責務分離リファクタリングの T040 で `TaskCreateServiceTest.java` へ分割する
+- [X] T017 [P] [US1] `backend/src/test/java/com/example/taskapp/task/controller/TaskCreateIntegrationTest.java` に POST 正常系、userId 空文字・空白のみ、不正 status、必須項目不足、JST timestamp の MockMvc 統合テストを追加する
+
+### ユーザーストーリー 1 の実装
+
+- [X] T018 [P] [US1] `backend/src/main/java/com/example/taskapp/task/dto/TaskCreateRequest.java` に `title` の `@NotBlank` 相当 validation、`status` の validation、任意 `description` を持つ登録 request DTO を作成する
+- [X] T019 [P] [US1] `backend/src/main/java/com/example/taskapp/task/dto/TaskResponse.java` に `id`、`userId`、`title`、`description`、`status`、`createdAt`、`updatedAt` を持つ response DTO を作成する
+- [X] T020 [US1] `backend/src/main/java/com/example/taskapp/task/dto/TaskResponseMapper.java` に `Task` から `TaskResponse` へ JST timestamp 付きで変換する mapper を作成する
+- [X] T021 [US1] `backend/src/main/java/com/example/taskapp/task/service/TaskService.java` に `createTask(String userId, TaskCreateRequest request)` と transaction boundary を実装する。Phase 4 責務分離リファクタリングの T041 で `TaskCreateService.java` へ分割する
+- [X] T022 [US1] `backend/src/main/java/com/example/taskapp/task/controller/TaskController.java` に `@NotBlank` 相当の `userId` path validation を含む `POST /users/{userId}/tasks` を追加し、成功時に 201 Created と `TaskResponse` を返す。Phase 4 責務分離リファクタリングの T042 で `TaskCreateController.java` へ分割する
+
+**チェックポイント**: ユーザーストーリー 1 が単体で動作し、MVP として登録 API を検証できる。
+
+---
+
+## Phase 4: ユーザーストーリー 2 - 自分のタスクを確認する (Priority: P2)
+
+**Goal**: 個人ユーザーが `GET /users/{userId}/tasks` と `GET /users/{userId}/tasks/{taskId}` で自分の未削除タスクだけを確認できる。
+
+**独立テスト**: 複数 userId と deleted task を test fixture で用意し、一覧が指定 userId の未削除 task のみを返し、詳細が一致し、存在しない task、別 userId、削除済み task は 404 になることを確認する。
+
+### ユーザーストーリー 2 のテスト
+
+- [X] T023 [US2] `backend/src/test/java/com/example/taskapp/task/service/TaskServiceTest.java` に `listTasks` と `getTask` の userId scope、deleted 除外、404 の単体テストを追加する。Phase 4 責務分離リファクタリングの T040 で `TaskReadServiceTest.java` へ分割する
+- [X] T024 [P] [US2] `backend/src/test/java/com/example/taskapp/task/controller/TaskQueryIntegrationTest.java` に list/detail の正常系、userId 空文字・空白のみ、別 userId 除外、deleted 除外、404 の MockMvc 統合テストを追加する。Phase 4 責務分離リファクタリングの T043 で `TaskReadIntegrationTest.java` へ整理する
+
+### ユーザーストーリー 2 の実装
+
+- [X] T025 [US2] `backend/src/main/java/com/example/taskapp/task/service/TaskService.java` に `listTasks(String userId)` と `getTask(String userId, Long taskId)` を実装する。Phase 4 責務分離リファクタリングの T041 で `TaskReadService.java` へ分割する
+- [X] T026 [US2] `backend/src/main/java/com/example/taskapp/task/controller/TaskController.java` に `@NotBlank` 相当の `userId` path validation を含む `GET /users/{userId}/tasks` と `GET /users/{userId}/tasks/{taskId}` を追加する。Phase 4 責務分離リファクタリングの T042 で `TaskReadController.java` へ分割する
+
+### Phase 4 責務分離リファクタリング
+
+**目的**: Phase 3/4 の登録・読み取り実装を、CRUD 集約ではなくユースケース単位の Service / Controller / Test へ揃える。T023-T026 の完了状態は、API 振る舞いの完了を示すものとして維持する。
+
+- [X] T040 [US1/US2] `backend/src/test/java/com/example/taskapp/task/service/TaskCreateServiceTest.java` と `backend/src/test/java/com/example/taskapp/task/service/TaskReadServiceTest.java` に単体テストを分割し、`TaskServiceTest` への追加をやめる
+- [X] T041 [US1/US2] `backend/src/main/java/com/example/taskapp/task/service/TaskCreateService.java` と `backend/src/main/java/com/example/taskapp/task/service/TaskReadService.java` に登録・読み取り処理を分割し、`TaskService` への CRUD 集約をやめる
+- [X] T042 [US1/US2] `backend/src/main/java/com/example/taskapp/task/controller/TaskCreateController.java` と `backend/src/main/java/com/example/taskapp/task/controller/TaskReadController.java` に endpoint を分割し、`TaskController` への CRUD 集約をやめる
+- [X] T043 [US1/US2] `backend/src/main/java/com/example/taskapp/task/service/TaskService.java` と `backend/src/main/java/com/example/taskapp/task/controller/TaskController.java` を削除し、`backend/src/test/java/com/example/taskapp/task/controller/TaskQueryIntegrationTest.java` を `TaskReadIntegrationTest.java` へ整理したうえで、`backend/src/test/java/com/example/taskapp/task/controller/TaskCreateIntegrationTest.java` と `backend/src/test/java/com/example/taskapp/task/controller/TaskReadIntegrationTest.java` が通ることを確認する
+
+**チェックポイント**: ユーザーストーリー 2 が単体テストと統合テストで検証でき、US1 と組み合わせても登録後の一覧・詳細確認ができる。
+
+---
+
+## Phase 5: ユーザーストーリー 3 - タスクの内容と進捗を更新する (Priority: P3)
+
+**Goal**: 個人ユーザーが `PUT /users/{userId}/tasks/{taskId}` で未削除タスクのタイトル、説明、ステータスを更新できる。
+
+**独立テスト**: 登録済み task fixture を更新し、取得結果に更新内容と新しい `updatedAt` が反映され、不正 status、存在しない task、別 userId、削除済み task は共通エラーになることを確認する。
+
+### ユーザーストーリー 3 のテスト
+
+- [X] T027 [US3] `backend/src/test/java/com/example/taskapp/task/service/TaskUpdateServiceTest.java` に固定 `Clock` で `updateTask` が内容と `updatedAt` を更新する単体テストを追加する
+- [X] T028 [P] [US3] `backend/src/test/java/com/example/taskapp/task/controller/TaskUpdateIntegrationTest.java` に PUT 正常系、userId 空文字・空白のみ、必須項目不足、不正 status、404 の MockMvc 統合テストを追加する
+
+### ユーザーストーリー 3 の実装
+
+- [X] T029 [P] [US3] `backend/src/main/java/com/example/taskapp/task/dto/TaskUpdateRequest.java` に `title` の `@NotBlank` 相当 validation、`status` の validation、任意 `description` を持つ更新 request DTO を作成する
+- [X] T030 [US3] `backend/src/main/java/com/example/taskapp/task/service/TaskUpdateService.java` に `updateTask(String userId, Long taskId, TaskUpdateRequest request)` を実装する
+- [X] T031 [US3] `backend/src/main/java/com/example/taskapp/task/controller/TaskUpdateController.java` に `@NotBlank` 相当の `userId` path validation を含む `PUT /users/{userId}/tasks/{taskId}` を追加する
+
+**チェックポイント**: ユーザーストーリー 3 が単体テストと統合テストで検証でき、US1/US2 と組み合わせて登録、更新、確認の流れを検証できる。
+
+---
+
+## Phase 6: ユーザーストーリー 4 - 不要なタスクを取り除く (Priority: P4)
+
+**Goal**: 個人ユーザーが `DELETE /users/{userId}/tasks/{taskId}` で task を論理削除し、通常の一覧・詳細から除外できる。
+
+**独立テスト**: 登録済み task fixture を削除し、204 が返り、一覧と詳細で取得できず、存在しない task、別 userId、削除済み task は 404 になることを確認する。
+
+### ユーザーストーリー 4 のテスト
+
+- [X] T032 [US4] `backend/src/test/java/com/example/taskapp/task/service/TaskDeleteServiceTest.java` に `deleteTask` が `deleted=true` と `updatedAt` を更新する単体テストを追加する
+- [X] T033 [P] [US4] `backend/src/test/java/com/example/taskapp/task/controller/TaskDeleteIntegrationTest.java` に DELETE 正常系、userId 空文字・空白のみ、削除後取得不可、404 の MockMvc 統合テストを追加する
+
+### ユーザーストーリー 4 の実装
+
+- [X] T034 [US4] `backend/src/main/java/com/example/taskapp/task/service/TaskDeleteService.java` に `deleteTask(String userId, Long taskId)` を実装し、物理削除ではなく `deleted=true` に更新する
+- [X] T035 [US4] `backend/src/main/java/com/example/taskapp/task/controller/TaskDeleteController.java` に `@NotBlank` 相当の `userId` path validation を含む `DELETE /users/{userId}/tasks/{taskId}` を追加し、成功時に 204 No Content を返す
+
+**チェックポイント**: ユーザーストーリー 4 が単体テストと統合テストで検証でき、登録から論理削除までの主要操作が一通り成立する。
+
+---
+
+## Phase 7: 仕上げと横断関心事
+
+**目的**: API 契約、quickstart、全体テスト、憲章制約を横断的に確認する。
+
+- [X] T036 [P] `backend/src/main/java/com/example/taskapp/task/controller/` 配下の各 Controller の HTTP method、path、status code、schema が `specs/001-task-basic-management/contracts/openapi.yaml` に一致することを確認して Controller を修正する。契約変更が必要な場合は `specs/001-task-basic-management/spec.md` と `specs/001-task-basic-management/plan.md` へ戻って更新する
+- [X] T037 [P] `specs/001-task-basic-management/quickstart.md` の curl シナリオを実装後 API に合わせて検証し、差分があれば同ファイルを更新する
+- [X] T038 `backend/pom.xml` を基点に `cd backend && ./mvnw test` を実行し、`*Test` と `*IntegrationTest` の失敗があれば `backend/src/test/java/com/example/taskapp/` と `backend/src/main/java/com/example/taskapp/` の該当箇所を修正する
+- [X] T039 `backend/src/main/java/com/example/taskapp/` 全体で `ZoneId.systemDefault()` の未使用、独自エラーコード未追加、DTO/Entity 分離、URL に動詞がないことを確認して必要なら修正する
+
+---
+
+## Phase 8: 例外ハンドラー保守性改善 (横断関心事)
+
+**目的**: Spring Boot 4 / Spring Framework 7 の検証例外を入力元ごとに正しく展開し、リクエストボディ、パス変数、将来のクエリパラメータ追加時にも共通エラーレスポンスを保守しやすくする。
+
+**独立テスト**: `@Valid @RequestBody`、`@PathVariable`、型変換失敗の各入力不正で HTTP 400 と `ErrorResponse` が返り、body DTO の field は `request` ではなく `title` / `status` として返ることを確認する。
+
+- [X] T044 [P] `backend/src/test/java/com/example/taskapp/common/exception/GlobalExceptionHandlerTest.java` に `MethodArgumentNotValidException` と `HandlerMethodValidationException` の両方が `ErrorResponse` の `details.field` を正しく返す単体テストを追加する
+- [X] T045 [P] `backend/src/test/java/com/example/taskapp/task/controller/TaskCreateIntegrationTest.java` の必須項目不足テストを `@Validated` に依存しない期待値として維持し、不足する場合は `title` / `status` の 400 details 検証を追加する
+- [X] T046 [P] `backend/src/test/java/com/example/taskapp/task/controller/TaskUpdateIntegrationTest.java` の必須項目不足テストを `@Validated` に依存しない期待値として維持し、不足する場合は `title` / `status` の 400 details 検証を追加する
+- [X] T047 [P] `backend/src/test/java/com/example/taskapp/task/controller/TaskReadIntegrationTest.java` と `backend/src/test/java/com/example/taskapp/task/controller/TaskDeleteIntegrationTest.java` の `userId` 空白テストを維持し、`taskId` 型変換失敗が共通 400 details を返す統合テストを追加する
+- [X] T048 `backend/src/main/java/com/example/taskapp/common/exception/GlobalExceptionHandler.java` で `MethodArgumentNotValidException` と `HandlerMethodValidationException` の `@ExceptionHandler` は分けたまま、`ErrorDetail` 変換と `badRequest` 生成を共通 private method に整理する
+- [X] T049 `backend/src/main/java/com/example/taskapp/common/exception/GlobalExceptionHandler.java` で `HandlerMethodValidationException` の `ParameterErrors` から `FieldError` を取り出し、DTO 内 field を `request` ではなく `title` / `status` として返す処理を実装する
+- [X] T050 `backend/src/main/java/com/example/taskapp/common/exception/GlobalExceptionHandler.java` に `MethodArgumentTypeMismatchException` と `MissingServletRequestParameterException` を 400 の `ErrorResponse` に変換する handler を追加する
+- [X] T051 `backend/src/main/java/com/example/taskapp/task/controller/TaskCreateController.java`、`backend/src/main/java/com/example/taskapp/task/controller/TaskReadController.java`、`backend/src/main/java/com/example/taskapp/task/controller/TaskUpdateController.java`、`backend/src/main/java/com/example/taskapp/task/controller/TaskDeleteController.java` からクラスレベルの `@Validated` と未使用 import を削除し、Controller 側は `@Valid` と各 path/query 制約だけを残す
+- [X] T052 `backend/pom.xml` を基点に `cd backend && ./mvnw test` を実行し、例外ハンドラー改善後も `GlobalExceptionHandlerTest`、`TaskCreateIntegrationTest`、`TaskReadIntegrationTest`、`TaskUpdateIntegrationTest`、`TaskDeleteIntegrationTest` が通ることを確認する
+- [X] T053 `specs/001-task-basic-management/quickstart.md` に入力不正確認として body 必須項目不足、`userId` 空白、`taskId` 型変換失敗の代表 curl と期待する共通 400 レスポンスを追記する
+
+**チェックポイント**: Spring の内部例外型が `MethodArgumentNotValidException` でも `HandlerMethodValidationException` でも、API 利用者へ返る `ErrorResponse` の構造と field 名が安定している。
+
+---
+
+## 依存関係と実行順序
+
+### フェーズ依存関係
+
+- **Phase 1 セットアップ**: 依存なし。すぐ開始できる。
+- **Phase 2 基盤**: Phase 1 完了に依存し、すべてのユーザーストーリーをブロックする。
+- **Phase 3 US1**: Phase 2 完了後に開始する。MVP 範囲。
+- **Phase 4 US2**: Phase 2 完了後に単体テストと統合テストで独立検証できる。インクリメンタル提供では US1 の後に実装する。
+- **Phase 4 責務分離リファクタリング**: Phase 3/4 の API 振る舞い完了後に実行し、Phase 5 以降の実装をブロックする。
+- **Phase 5 US3**: Phase 2 と Phase 4 責務分離リファクタリング完了後に単体テストと統合テストで独立検証できる。インクリメンタル提供では US2 の後に実装する。
+- **Phase 6 US4**: Phase 2 完了後に単体テストと統合テストで独立検証できる。インクリメンタル提供では US3 の後に実装する。
+- **Phase 7 仕上げ**: 対象ユーザーストーリー完了後に実行する。
+- **Phase 8 例外ハンドラー保守性改善**: Phase 2 の共通例外基盤と対象 Controller 実装完了後に実行する。US1 から US4 の API レスポンス形式を横断して保護する。
+
+### ユーザーストーリー依存関係
+
+- **US1 (P1)**: 登録 API。MVP。ほかのストーリーへの依存なし。
+- **US2 (P2)**: 一覧・詳細 API。`TaskReadService` 単体テストと API/DB 統合テストで独立テスト可能。US1 と統合すると登録後確認の価値が完成する。
+- **US3 (P3)**: 更新 API。`TaskUpdateService` 単体テストと API/DB 統合テストで独立テスト可能。US1/US2 と統合すると登録、更新、確認の流れが完成する。
+- **US4 (P4)**: 論理削除 API。`TaskDeleteService` 単体テストと API/DB 統合テストで独立テスト可能。US2 と統合すると削除後の一覧・詳細除外が完成する。
+
+### 各ユーザーストーリー内の順序
+
+- 単体テストと統合テストのタスクを先に作成し、ビジネスロジックと API/DB の期待値を固定する。
+- DTO と mapper を service/controller より前に作る。
+- Service の transaction boundary と business rule を Controller endpoint より前に実装する。
+- Service / Controller は登録・読み取り・更新・削除のユースケース単位で分け、`TaskService` / `TaskController` へ CRUD を集約しない。
+- Controller は担当ユースケースの Service のみを呼び出し、Repository を直接呼ばない。
+- 各ストーリー完了時に対象ストーリーの単体テストと統合テストを通す。
+
+---
+
+## 並列実行例
+
+### ユーザーストーリー 1
+
+```bash
+Task: "T016 backend/src/test/java/com/example/taskapp/task/service/TaskServiceTest.java"
+Task: "T017 backend/src/test/java/com/example/taskapp/task/controller/TaskCreateIntegrationTest.java"
+Task: "T018 backend/src/main/java/com/example/taskapp/task/dto/TaskCreateRequest.java"
+Task: "T019 backend/src/main/java/com/example/taskapp/task/dto/TaskResponse.java"
+```
+
+### ユーザーストーリー 2
+
+```bash
+Task: "T023 backend/src/test/java/com/example/taskapp/task/service/TaskServiceTest.java"
+Task: "T024 backend/src/test/java/com/example/taskapp/task/controller/TaskQueryIntegrationTest.java"
+```
+
+### Phase 4 責務分離リファクタリング
+
+```bash
+Task: "T040 backend/src/test/java/com/example/taskapp/task/service/TaskCreateServiceTest.java"
+Task: "T040 backend/src/test/java/com/example/taskapp/task/service/TaskReadServiceTest.java"
+Task: "T041 backend/src/main/java/com/example/taskapp/task/service/TaskCreateService.java"
+Task: "T041 backend/src/main/java/com/example/taskapp/task/service/TaskReadService.java"
+Task: "T042 backend/src/main/java/com/example/taskapp/task/controller/TaskCreateController.java"
+Task: "T042 backend/src/main/java/com/example/taskapp/task/controller/TaskReadController.java"
+```
+
+### ユーザーストーリー 3
+
+```bash
+Task: "T027 backend/src/test/java/com/example/taskapp/task/service/TaskUpdateServiceTest.java"
+Task: "T028 backend/src/test/java/com/example/taskapp/task/controller/TaskUpdateIntegrationTest.java"
+Task: "T029 backend/src/main/java/com/example/taskapp/task/dto/TaskUpdateRequest.java"
+```
+
+### ユーザーストーリー 4
+
+```bash
+Task: "T032 backend/src/test/java/com/example/taskapp/task/service/TaskDeleteServiceTest.java"
+Task: "T033 backend/src/test/java/com/example/taskapp/task/controller/TaskDeleteIntegrationTest.java"
+```
+
+### Phase 8 例外ハンドラー保守性改善
+
+```bash
+Task: "T044 backend/src/test/java/com/example/taskapp/common/exception/GlobalExceptionHandlerTest.java"
+Task: "T045 backend/src/test/java/com/example/taskapp/task/controller/TaskCreateIntegrationTest.java"
+Task: "T046 backend/src/test/java/com/example/taskapp/task/controller/TaskUpdateIntegrationTest.java"
+Task: "T047 backend/src/test/java/com/example/taskapp/task/controller/TaskReadIntegrationTest.java"
+Task: "T047 backend/src/test/java/com/example/taskapp/task/controller/TaskDeleteIntegrationTest.java"
+```
+
+---
+
+## 実装戦略
+
+### MVP First (US1 のみ)
+
+1. Phase 1 と Phase 2 を完了する。
+2. Phase 3 の US1 を完了する。
+3. `POST /users/{userId}/tasks` の正常系、入力不正、JST timestamp を単体テストと統合テストで確認する。
+4. 登録 API を MVP として停止・レビューできる状態にする。
+
+### インクリメンタルデリバリー
+
+1. US1: 登録 API を追加し、MVP として検証する。
+2. US2: 一覧・詳細 API を追加し、登録済み task の確認を可能にする。
+3. Phase 4 責務分離リファクタリングで、登録・読み取りを `TaskCreate*` / `TaskRead*` に分割する。
+4. US3: 更新 API を `TaskUpdate*` として追加し、内容と進捗の変更を可能にする。
+5. US4: 論理削除 API を `TaskDelete*` として追加し、不要 task の除外を可能にする。
+6. Phase 8 で共通例外ハンドラーを Spring 7 の検証例外に強い形へ整理し、入力元ごとの 400 details を回帰テストで固定する。
+7. Phase 7 で OpenAPI、quickstart、全体テスト、憲章制約を確認する。
+
+### Jira ブランチ運用メモ
+
+- 親 feature は `feature/SCRUM-6`。
+- 各サブタスク実装開始直前に、対象 Jira issue に対応する `feature/sub/SCRUM-x` ブランチを切る。
+- サブタスク完了時は `feature/sub/SCRUM-x` から `feature/SCRUM-6` へ Pull Request を作成する。
+
+---
+
+## Notes
+
+- [P] タスクは別ファイルで進められるが、同一ストーリー内の Service/Controller 更新は順序を守る。
+- `TaskService` / `TaskController` のような CRUD 集約クラスは作らない。既に作成済みの場合は、Phase 4 責務分離リファクタリングで削除し、`TaskCreate*`、`TaskRead*`、`TaskUpdate*`、`TaskDelete*` に分割する。
+- `status` 未指定時の `TODO` 補完や部分更新は `backend/AGENTS.md` に記載があるが、今回の `specs/` 配下の仕様では status 必須、PUT による全体更新を優先する。
+- `ErrorResponse.code` は HTTP ステータスコードの整数のみを使い、アプリケーション独自コードは追加しない。
+- API 応答の `createdAt` / `updatedAt` は JST (`+09:00`) の ISO-8601 文字列とし、サーバのデフォルトタイムゾーンには依存しない。
