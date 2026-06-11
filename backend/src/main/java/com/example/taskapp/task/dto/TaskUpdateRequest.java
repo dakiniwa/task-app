@@ -12,10 +12,6 @@ import jakarta.validation.constraints.NotNull;
  * @param description タスク説明
  * @param status タスクの進捗状態
  */
-public record TaskUpdateRequest(
-	@NotBlank(message = "title は必須です")
-	String title,
-	String description,
-	@NotNull(message = "status は必須です")
-	TaskStatus status) {
+public record TaskUpdateRequest(@NotBlank(message = "title は必須です") String title, String description,
+		@NotNull(message = "status は必須です") TaskStatus status) {
 }

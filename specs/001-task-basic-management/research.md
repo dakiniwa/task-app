@@ -14,7 +14,7 @@
 
 ## 3. 永続化方式と依存関係
 
-- 決定: `Task` は Spring Data JPA の Entity として PostgreSQL 17 に保存する。実装時に `spring-boot-starter-data-jpa`、`postgresql`、`spring-boot-starter-validation` を追加する。
+- 決定: `Task` は Spring Data JPA の Entity として PostgreSQL 18 に保存する。実装時に `spring-boot-starter-data-jpa`、`postgresql`、`spring-boot-starter-validation` を追加する。
 - 根拠: プロジェクトの技術スタックが Spring Data JPA と PostgreSQL を前提としており、Task は作成時点・更新時点・削除状態を保持する必要がある。Validation は必須入力と enum 制約の入口検証に必要である。
 - 検討した代替案: インメモリ保存は永続化要件を満たさない。JDBC 直書きは現在のアーキテクチャ方針より低レベルで、Repository 境界の一貫性が落ちるため採用しない。
 

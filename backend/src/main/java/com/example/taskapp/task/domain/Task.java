@@ -55,8 +55,7 @@ public class Task {
 	/**
 	 * JPA のデフォルトコンストラクタ。
 	 */
-	protected Task() {
-	}
+	protected Task() {}
 
 	/**
 	 * タスクを作成します。
@@ -68,7 +67,8 @@ public class Task {
 	 * @param createdAt 作成日時
 	 * @param updatedAt 更新日時
 	 */
-	public Task(String userId, String title, String description, TaskStatus status, Instant createdAt, Instant updatedAt) {
+	public Task(String userId, String title, String description, TaskStatus status, Instant createdAt,
+			Instant updatedAt) {
 		this.userId = userId;
 		this.title = title;
 		this.description = description;

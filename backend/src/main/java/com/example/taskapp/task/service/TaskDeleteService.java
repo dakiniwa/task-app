@@ -43,7 +43,7 @@ public class TaskDeleteService {
 	@Transactional
 	public void deleteTask(String userId, Long taskId) {
 		Task task = taskRepository.findByIdAndUserIdAndDeletedFalse(taskId, userId)
-			.orElseThrow(TaskNotFoundException::new);
+				.orElseThrow(TaskNotFoundException::new);
 		task.delete(Instant.now(clock));
 	}
 }

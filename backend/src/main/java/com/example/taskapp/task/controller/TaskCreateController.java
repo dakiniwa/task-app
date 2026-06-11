@@ -6,7 +6,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +21,6 @@ import com.example.taskapp.task.service.TaskCreateService;
  */
 @RestController
 @RequestMapping("/users/{userId}/tasks")
-@Validated
 public class TaskCreateController {
 
 	// タスク登録サービス

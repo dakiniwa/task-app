@@ -13,12 +13,6 @@ import com.example.taskapp.task.domain.TaskStatus;
  * @param createdAt 作成日時
  * @param updatedAt 更新日時
  */
-public record TaskResponse(
-	Long id,
-	String userId,
-	String title,
-	String description,
-	TaskStatus status,
-	String createdAt,
-	String updatedAt) {
+public record TaskResponse(Long id, String userId, String title, String description,
+		TaskStatus status, String createdAt, String updatedAt) {
 }

@@ -30,6 +30,7 @@ public class JstDateTimeFormatter {
 	 * @return ISOオフセット日時文字列
 	 */
 	public String format(Instant instant) {
-		return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(instant.atZone(taskZoneId).toOffsetDateTime());
+		return DateTimeFormatter.ISO_OFFSET_DATE_TIME
+				.format(instant.atZone(taskZoneId).toOffsetDateTime());
 	}
 }

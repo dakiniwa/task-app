@@ -51,7 +51,8 @@ class TaskUpdateIntegrationTest {
 		try (Connection connection = dataSource.getConnection();
 				InputStream dataset = new ClassPathResource("/dbunit/tasks.xml").getInputStream()) {
 			DatabaseConnection dbUnitConnection = new DatabaseConnection(connection);
-			dbUnitConnection.getConfig().setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new H2DataTypeFactory());
+			dbUnitConnection.getConfig().setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY,
+					new H2DataTypeFactory());
 			IDataSet dataSet = new FlatXmlDataSetBuilder().setColumnSensing(true).build(dataset);
 			DatabaseOperation.CLEAN_INSERT.execute(dbUnitConnection, dataSet);
 		}
@@ -64,28 +65,24 @@ class TaskUpdateIntegrationTest {
 		@Test
 		@DisplayName("指定ユーザーの未削除タスクを更新して取得結果にも反映する")
 		void updateTaskUpdatesVisibleUserTaskAndReadResult() throws Exception {
-			mockMvc.perform(put("/users/user-1/tasks/1")
-					.contentType(MediaType.APPLICATION_JSON)
-					.content("""
-						{"title":"updated","description":"new description","status":"DOING"}
-						"""))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id").value(1))
-				.andExpect(jsonPath("$.userId").value("user-1"))
-				.andExpect(jsonPath("$.title").value("updated"))
-				.andExpect(jsonPath("$.description").value("new description"))
-				.andExpect(jsonPath("$.status").value("DOING"))
-				.andExpect(jsonPath("$.createdAt", endsWith("+09:00")))
-				.andExpect(jsonPath("$.updatedAt", endsWith("+09:00")))
-				.andExpect(jsonPath("$.updatedAt").value(not(OLD_UPDATED_AT)));
+			mockMvc
+					.perform(put("/users/user-1/tasks/1").contentType(MediaType.APPLICATION_JSON).content("""
+							{"title":"updated","description":"new description","status":"DOING"}
+							""")).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(1))
+					.andExpect(jsonPath("$.userId").value("user-1"))
+					.andExpect(jsonPath("$.title").value("updated"))
+					.andExpect(jsonPath("$.description").value("new description"))
+					.andExpect(jsonPath("$.status").value("DOING"))
+					.andExpect(jsonPath("$.createdAt", endsWith("+09:00")))
+					.andExpect(jsonPath("$.updatedAt", endsWith("+09:00")))
+					.andExpect(jsonPath("$.updatedAt").value(not(OLD_UPDATED_AT)));
 
-			mockMvc.perform(get("/users/user-1/tasks/1"))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.title").value("updated"))
-				.andExpect(jsonPath("$.description").value("new description"))
-				.andExpect(jsonPath("$.status").value("DOING"))
-				.andExpect(jsonPath("$.updatedAt", endsWith("+09:00")))
-				.andExpect(jsonPath("$.updatedAt").value(not(OLD_UPDATED_AT)));
+			mockMvc.perform(get("/users/user-1/tasks/1")).andExpect(status().isOk())
+					.andExpect(jsonPath("$.title").value("updated"))
+					.andExpect(jsonPath("$.description").value("new description"))
+					.andExpect(jsonPath("$.status").value("DOING"))
+					.andExpect(jsonPath("$.updatedAt", endsWith("+09:00")))
+					.andExpect(jsonPath("$.updatedAt").value(not(OLD_UPDATED_AT)));
 		}
 	}
 
@@ -98,56 +95,51 @@ class TaskUpdateIntegrationTest {
 		@Test
 		@DisplayName("userId が空白のみの場合は共通エラーレスポンスを返す")
 		void updateTaskRejectsBlankUserId() throws Exception {
-			mockMvc.perform(put("/users/{userId}/tasks/1", " ")
-					.contentType(MediaType.APPLICATION_JSON)
-					.content("""
-						{"title":"updated","status":"DOING"}
-						"""))
-				.andExpect(status().isBadRequest())
-				.andExpect(badRequestErrorResponse(BAD_REQUEST_MESSAGE))
-				.andExpect(jsonPath("$.details[0].field", endsWith("userId")))
-				.andExpect(jsonPath("$.details[0].message").value("userId は必須です"));
+			mockMvc
+					.perform(put("/users/{userId}/tasks/1", " ").contentType(MediaType.APPLICATION_JSON)
+							.content("""
+									{"title":"updated","status":"DOING"}
+									"""))
+					.andExpect(status().isBadRequest())
+					.andExpect(badRequestErrorResponse(BAD_REQUEST_MESSAGE))
+					.andExpect(jsonPath("$.details[0].field", endsWith("userId")))
+					.andExpect(jsonPath("$.details[0].message").value("userId は必須です"));
 		}
 
 		@Test
 		@DisplayName("必須項目が不足している場合は共通エラーレスポンスを返す")
 		void updateTaskRejectsMissingRequiredFields() throws Exception {
-			mockMvc.perform(put("/users/user-1/tasks/1")
-					.contentType(MediaType.APPLICATION_JSON)
-					.content("""
-						{"description":"new description"}
-						"""))
-				.andExpect(status().isBadRequest())
-				.andExpect(badRequestErrorResponse(BAD_REQUEST_MESSAGE))
-				.andExpect(jsonPath("$.details[*].field", containsInAnyOrder("title", "status")))
-				.andExpect(jsonPath("$.details[*].message", containsInAnyOrder("title は必須です", "status は必須です")));
+			mockMvc
+					.perform(put("/users/user-1/tasks/1").contentType(MediaType.APPLICATION_JSON).content("""
+							{"description":"new description"}
+							""")).andExpect(status().isBadRequest())
+					.andExpect(badRequestErrorResponse(BAD_REQUEST_MESSAGE))
+					.andExpect(jsonPath("$.details[*].field", containsInAnyOrder("title", "status")))
+					.andExpect(
+							jsonPath("$.details[*].message", containsInAnyOrder("title は必須です", "status は必須です")));
 		}
 
 		@Test
 		@DisplayName("不正な status の場合は共通エラーレスポンスを返す")
 		void updateTaskRejectsInvalidStatus() throws Exception {
-			mockMvc.perform(put("/users/user-1/tasks/1")
-					.contentType(MediaType.APPLICATION_JSON)
-					.content("""
-						{"title":"updated","status":"BLOCKED"}
-						"""))
-				.andExpect(status().isBadRequest())
-				.andExpect(badRequestErrorResponse(BAD_REQUEST_MESSAGE))
-				.andExpect(jsonPath("$.details[0].message").value("リクエストボディの形式が不正です"));
+			mockMvc
+					.perform(put("/users/user-1/tasks/1").contentType(MediaType.APPLICATION_JSON).content("""
+							{"title":"updated","status":"BLOCKED"}
+							""")).andExpect(status().isBadRequest())
+					.andExpect(badRequestErrorResponse(BAD_REQUEST_MESSAGE))
+					.andExpect(jsonPath("$.details[0].message").value("リクエストボディの形式が不正です"));
 		}
 
 		@Test
 		@DisplayName("taskId が1未満の場合は共通エラーレスポンスを返す")
 		void updateTaskRejectsNonPositiveTaskId() throws Exception {
-			mockMvc.perform(put("/users/user-1/tasks/0")
-					.contentType(MediaType.APPLICATION_JSON)
-					.content("""
-						{"title":"updated","status":"DOING"}
-						"""))
-				.andExpect(status().isBadRequest())
-				.andExpect(badRequestErrorResponse(BAD_REQUEST_MESSAGE))
-				.andExpect(jsonPath("$.details[0].field", endsWith("taskId")))
-				.andExpect(jsonPath("$.details[0].message").value("taskId は1以上を指定してください"));
+			mockMvc
+					.perform(put("/users/user-1/tasks/0").contentType(MediaType.APPLICATION_JSON).content("""
+							{"title":"updated","status":"DOING"}
+							""")).andExpect(status().isBadRequest())
+					.andExpect(badRequestErrorResponse(BAD_REQUEST_MESSAGE))
+					.andExpect(jsonPath("$.details[0].field", endsWith("taskId")))
+					.andExpect(jsonPath("$.details[0].message").value("taskId は1以上を指定してください"));
 		}
 	}
 
@@ -158,37 +150,28 @@ class TaskUpdateIntegrationTest {
 		@Test
 		@DisplayName("存在しないタスクは共通エラーレスポンスを返す")
 		void updateTaskReturnsNotFoundForMissingTask() throws Exception {
-			mockMvc.perform(put("/users/user-1/tasks/999")
-					.contentType(MediaType.APPLICATION_JSON)
-					.content("""
-						{"title":"updated","status":"DOING"}
-						"""))
-				.andExpect(status().isNotFound())
-				.andExpect(notFoundErrorResponse());
+			mockMvc.perform(
+					put("/users/user-1/tasks/999").contentType(MediaType.APPLICATION_JSON).content("""
+							{"title":"updated","status":"DOING"}
+							""")).andExpect(status().isNotFound()).andExpect(notFoundErrorResponse());
 		}
 
 		@Test
 		@DisplayName("別ユーザーのタスクは共通エラーレスポンスを返す")
 		void updateTaskReturnsNotFoundForOtherUserTask() throws Exception {
-			mockMvc.perform(put("/users/user-1/tasks/4")
-					.contentType(MediaType.APPLICATION_JSON)
-					.content("""
-						{"title":"updated","status":"DOING"}
-						"""))
-				.andExpect(status().isNotFound())
-				.andExpect(notFoundErrorResponse());
+			mockMvc
+					.perform(put("/users/user-1/tasks/4").contentType(MediaType.APPLICATION_JSON).content("""
+							{"title":"updated","status":"DOING"}
+							""")).andExpect(status().isNotFound()).andExpect(notFoundErrorResponse());
 		}
 
 		@Test
 		@DisplayName("論理削除済みタスクは共通エラーレスポンスを返す")
 		void updateTaskReturnsNotFoundForDeletedTask() throws Exception {
-			mockMvc.perform(put("/users/user-1/tasks/3")
-					.contentType(MediaType.APPLICATION_JSON)
-					.content("""
-						{"title":"updated","status":"DOING"}
-						"""))
-				.andExpect(status().isNotFound())
-				.andExpect(notFoundErrorResponse());
+			mockMvc
+					.perform(put("/users/user-1/tasks/3").contentType(MediaType.APPLICATION_JSON).content("""
+							{"title":"updated","status":"DOING"}
+							""")).andExpect(status().isNotFound()).andExpect(notFoundErrorResponse());
 		}
 	}
 

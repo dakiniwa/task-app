@@ -30,13 +30,8 @@ public class TaskResponseMapper {
 	 * @return タスクレスポンス
 	 */
 	public TaskResponse toResponse(Task task) {
-		return new TaskResponse(
-			task.getId(),
-			task.getUserId(),
-			task.getTitle(),
-			task.getDescription(),
-			task.getStatus(),
-			dateTimeFormatter.format(task.getCreatedAt()),
-			dateTimeFormatter.format(task.getUpdatedAt()));
+		return new TaskResponse(task.getId(), task.getUserId(), task.getTitle(), task.getDescription(),
+				task.getStatus(), dateTimeFormatter.format(task.getCreatedAt()),
+				dateTimeFormatter.format(task.getUpdatedAt()));
 	}
 }

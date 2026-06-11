@@ -41,7 +41,8 @@ class TaskCreateServiceTest {
 	private Clock clock;
 
 	@Spy
-	private TaskResponseMapper taskResponseMapper = new TaskResponseMapper(new JstDateTimeFormatter(JST));
+	private TaskResponseMapper taskResponseMapper =
+			new TaskResponseMapper(new JstDateTimeFormatter(JST));
 
 	@InjectMocks
 	private TaskCreateService taskCreateService;
