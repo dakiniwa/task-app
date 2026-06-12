@@ -16,11 +16,11 @@
 
 **目的**: フロントエンド開発・確認基盤と最小ディレクトリ構成を整える。
 
-- [ ] T001 `AGENTS.md` と `frontend/AGENTS.md` を確認し、SCRUM-7 実装で守るルールを `specs/002-frontend-task-management/quickstart.md` の確認観点として把握する
-- [ ] T002 [P] `frontend/.env.example` に `NEXT_PUBLIC_API_BASE_URL=http://localhost:8080` を追加する
-- [ ] T003 `frontend/src/features/tasks/` と `frontend/src/shared/` の構成を plan.md に合わせて作成する
-- [ ] T004 [P] `frontend/src/shared/lib/apiConfig.ts` に `NEXT_PUBLIC_API_BASE_URL` を読む API base URL ヘルパーを作成する
-- [ ] T005 `frontend/package.json` と `frontend/package-lock.json` の `typescript` を 6 系へ更新し、`frontend/tsconfig.json` の `target`, `lib`, `noEmit`, `moduleResolution` の役割を確認したうえで、`frontend/package.json` の `lint` と `build` を確認コマンドとして実行できることを確認する
+- [X] T001 `AGENTS.md` と `frontend/AGENTS.md` を確認し、SCRUM-7 実装で守るルールを `specs/002-frontend-task-management/quickstart.md` の確認観点として把握する
+- [X] T002 [P] `frontend/.env.example` に `NEXT_PUBLIC_API_BASE_URL=http://localhost:8080` を追加する
+- [X] T003 `frontend/src/features/tasks/` と `frontend/src/shared/` の構成を plan.md に合わせて作成する
+- [X] T004 [P] `frontend/src/shared/lib/apiConfig.ts` に `NEXT_PUBLIC_API_BASE_URL` を読む API base URL ヘルパーを作成する
+- [X] T005 `frontend/package.json` と `frontend/package-lock.json` の `typescript` を 6 系へ更新し、`frontend/tsconfig.json` の `target`, `lib`, `noEmit`, `moduleResolution` の役割を確認したうえで、`frontend/package.json` の `lint` と `build` を確認コマンドとして実行できることを確認する
 
 **チェックポイント**: SCRUM-25 完了時点で、後続フェーズが `features/tasks` と `shared` に実装を追加できる。
 

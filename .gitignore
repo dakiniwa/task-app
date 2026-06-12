@@ -19,10 +19,10 @@ npm-debug.log*
 
 # env
 .env*
+!**/.env.example
 
 # cursor
 .cursor/
 
 # codex
 .codex/config.toml
-
